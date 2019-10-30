@@ -88,8 +88,7 @@ class PolynomialFunction:
 
     def __plot__(self, x1, x2):
         x = np.linspace(x1, x2, 50, endpoint = True)
-        for element in x:
-            plt.plot(element, self.__call__(element))
+        plt.plot(x, self.__call__(x))
         plt.show()
 
     def __random_set__(self, limit, number_of_samples, x):
@@ -99,6 +98,7 @@ class PolynomialFunction:
         return result
 
 
+
 def main():
     function = PolynomialFunction([0, 1, 2, 3, 4, 5])
     w = function.__random_set__(100, 200, 11)
@@ -106,7 +106,7 @@ def main():
     function.__call__(10)
 
     func = PolynomialFunction([1, 2, 3])
-    func.__plot__(-10, 10)
+    func.__plot__(-100, 100)
 
 
 if __name__ == '__main__':
