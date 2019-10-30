@@ -14,7 +14,7 @@ class PolynomialFunction:
                         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
         self.signs = ['+', '-', '*']
 
-    def __init__(self, *coefficients):
+    def __init__(self, coefficients):
         self.coefficients = coefficients
 
 
@@ -61,8 +61,10 @@ class PolynomialFunction:
 
     def __call__(self, x):
         result = 0
-        for index, coefficient in enumerate(self.coefficients[::-1]):
+        index = 0
+        for coefficient in reversed(self.coefficients):
             result += coefficient * pow(x, index)
+            index += 1
         return result
 
 
@@ -92,7 +94,8 @@ class PolynomialFunction:
 
     def __plot__(self, x1, x2):
         x = np.linspace(x1, x2, 50, endpoint = True)
-        plt.plot(x, self.__call__(self.coefficients))
+        for element in x:
+            plt.plot(element, self.__call__(element))
         plt.show()
 
 
@@ -100,8 +103,12 @@ class PolynomialFunction:
 
 
 def main():
-    function = PolynomialFunction(0, 1, 2, 3, 4, 5)
-    opt.optimise(w, "SGD")
+    function = PolynomialFunction([0, 1, 2, 3, 4, 5])
+    function.__call__(10)
+   #s opt.optimise(w, "SGD")
 
-    func = PolynomialFunction(1, 2, 3)
+    func = PolynomialFunction([1, 2, 3])
     func.__plot__(-10, 10)
+
+if __name__ == '__main__':
+    main()
