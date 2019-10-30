@@ -3,6 +3,7 @@ from builtins import list, str, enumerate
 from itertools import zip_longest
 import numpy as np
 import matplotlib.pyplot as plt
+import optimisation as opt
 
 class PolynomialFunction:
 
@@ -45,7 +46,7 @@ class PolynomialFunction:
         return self.__check_complete(self.coefficients, powers)
 
 
-     def __check_complete__(self, coefficients, powers):
+    def __check_complete__(self, coefficients, powers):
         try:
             factor = 0
             for index in range(len(powers)):
@@ -54,14 +55,14 @@ class PolynomialFunction:
                     factor += 1
                     difference -= 1
                     coefficients.insert(index+1, 0)
-         except:
+        except:
             return coefficients
 
 
     def __call__(self, x):
         result = 0
         for index, coefficient in enumerate(self.coefficients[::-1]):
-            result += coefficient * x ** index
+            result += coefficient * pow(x, index)
         return result
 
 
@@ -89,12 +90,18 @@ class PolynomialFunction:
         return grad_fun
 
 
-    # def __plot__(self, x1, x2):
-    #     X = np.linspace(x1, x2, 50, endpoint = True)
-    #     F1 = self
-    #
+    def __plot__(self, x1, x2):
+        x = np.linspace(x1, x2, 50, endpoint = True)
+        plt.plot(x, self.__call__(self.coefficients))
+        plt.show()
+
+
+
 
 
 def main():
     function = PolynomialFunction(0, 1, 2, 3, 4, 5)
     opt.optimise(w, "SGD")
+
+    func = PolynomialFunction(1, 2, 3)
+    func.__plot__(-10, 10)
