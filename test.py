@@ -87,8 +87,14 @@ class PolynomialFunction:
         return grad_fun
 
     def __plot__(self, x1, x2):
-        x = np.linspace(x1, x2, 50, endpoint = True)
+        x = np.linspace(x1, x2, 50, endpoint=True)
         plt.plot(x, self.__call__(x))
+        plt.show()
+
+    def __plot__(self, x1, x2, dot):
+        x = np.linspace(x1, x2, 50, endpoint=True)
+        plt.plot(x, self.__call__(x))
+        plt.plot(dot, self.__call__(dot), 'ro')
         plt.show()
 
     def __random_set__(self, limit, number_of_samples, x):
@@ -99,13 +105,9 @@ class PolynomialFunction:
 
 
 def main():
-    function = PolynomialFunction([0, 1, 2, 3, 4])
-    w = function.__random_set__(100, 200, 11)
-    opt.optimise(w, "SGD")
-    function.__call__(10)
-
-    func = PolynomialFunction([1, 2, 3])
-    func.__plot__(-100, 100)
+    function = PolynomialFunction([9, 6, 8])
+    opt.optimise("SGDAnimation", function, 0.1, 10000, 10000)
+    opt.optimise("SGDMAnimation", function, 0.1, 10000, 10000, 0.05)
 
 
 if __name__ == '__main__':
