@@ -98,9 +98,8 @@ class PolynomialFunction:
         return result
 
 
-
 def main():
-    function = PolynomialFunction([0, 1, 2, 3, 4, 5])
+    function = PolynomialFunction([0, 1, 2, 3, 4])
     w = function.__random_set__(100, 200, 11)
     opt.optimise(w, "SGD")
     function.__call__(10)
