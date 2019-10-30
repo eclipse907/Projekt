@@ -93,3 +93,8 @@ class PolynomialFunction:
     #     X = np.linspace(x1, x2, 50, endpoint = True)
     #     F1 = self
     #
+
+
+def main():
+    function = PolynomialFunction(0, 1, 2, 3, 4, 5)
+    opt.optimise(w, "SGD")
