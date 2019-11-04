@@ -1,5 +1,4 @@
 import numpy as np
-from math import exp
 from L2Regularizer import *
 
 def sigmoid(s):
@@ -26,17 +25,17 @@ def binlogreg_train(X, Y_, w, lambdaFactor, param_niter=100, param_delta=0.1):
         l2RegLoss = L2.forward()
         loss += l2RegLoss
 
-        if i % 10 == 0:
+        if i % 1 == 0:
             print("iteration {}: loss {}".format(i, loss))
 
         dL_dscores = probs - Y_
 
         l2RegGradW = L2.backward_params()[0][1]
 
-        grad_w = 1/N * np.dot(np.transpose(dL_dscores), X) + l2RegGradW
+        grad_w = 1/N * np.dot(np.transpose(dL_dscores), X) + np.transpose(l2RegGradW)
         grad_b = 1/N * np.sum(dL_dscores)
 
-        w += -param_delta * grad_w
+        w += -param_delta * np.transpose(grad_w)
         b += -param_delta * grad_b
 
     return (w, b)
@@ -46,11 +45,18 @@ def binlogreg_train(X, Y_, w, lambdaFactor, param_niter=100, param_delta=0.1):
 
 if __name__ == "__main__":
     np.random.seed(100)
+    #np.random.seed(10)  # Loss se povecava kroz iteracije????
 
-    X, Y_ = np.empty([2, 3]), np.empty([2, 1])
+    minv = 0
+    maxv = 1
+
+    X = np.random.rand(2,3) * (maxv - minv) + minv
+    Y_ = np.random.rand(2,1) * (maxv - minv) + minv
     W = np.random.randn(X.shape[1], 1)
 
-    lambdaFactor = exp(-3)
+    lambdaFactor = np.exp(-3)
+    #lambdaFactor = np.exp(-2)
+    #lambdaFactor = np.exp(-1)
 
     wb = binlogreg_train(X, Y_, W, lambdaFactor)
     print(wb)
