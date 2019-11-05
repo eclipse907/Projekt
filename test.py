@@ -86,16 +86,7 @@ class PolynomialFunction:
         grad_fun = np.polyder(fun)
         return grad_fun
 
-    def __plot__(self, x1, x2):
-        x = np.linspace(x1, x2, 50, endpoint=True)
-        plt.plot(x, self.__call__(x))
-        plt.show()
 
-    def __plot__(self, x1, x2, dot):
-        x = np.linspace(x1, x2, 50, endpoint=True)
-        plt.plot(x, self.__call__(x))
-        plt.plot(dot, self.__call__(dot), 'ro')
-        plt.show()
 
     def __random_set__(self, limit, number_of_samples, x):
         random_inputs = np.random.random_sample(number_of_samples)
@@ -105,9 +96,9 @@ class PolynomialFunction:
 
 
 def main():
-    function = PolynomialFunction([9, 6, 8])
-    opt.optimise("SGDAnimation", function, 0.1, 10000, 10000)
-    opt.optimise("SGDMAnimation", function, 0.1, 10000, 10000, 0.05)
+    function = PolynomialFunction([1, 1, 1])
+    #opt.optimise("SGD", function, 0.1, 10000, 10000)
+    opt.optimise("SGDM", function, 0.005, 50, 50, 0.05)
 
 
 if __name__ == '__main__':
