@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 import data
 
@@ -51,6 +52,13 @@ def binlogreg_classify(X, w, b):
     return probs
 
 
+def binlogreg_decfun(w, b):
+    def classify(X):
+        return binlogreg_classify(X, w, b)
+
+    return classify
+
+
 if __name__ == '__main__':
     np.random.seed(100)
 
@@ -62,9 +70,21 @@ if __name__ == '__main__':
 
     # evaluate the model on the training dataset
     probs = binlogreg_classify(X, w, b)
-    Y = np.around(probs)
+    Y = probs > 0.5
 
     # report performance
     accuracy, recall, precision = data.eval_perf_binary(Y, Y_)
     AP = data.eval_AP(Y_[probs.argsort()])
     print(accuracy, recall, precision, AP)
+
+    # graph the decision surface
+    decfun = binlogreg_decfun(w, b)
+    # decfun = lambda X: binlogreg_classify(X, w, b)
+    bbox = (np.min(X, axis=0), np.max(X, axis=0))
+    data.graph_surface(decfun, bbox, offset=0.5)
+
+    # graph the data points
+    data.graph_data(X, Y_, Y, special=[])
+
+    # show the plot
+    plt.show()

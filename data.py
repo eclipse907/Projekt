@@ -95,12 +95,12 @@ def graph_data(X, Y_, Y, special=[]):
     # draw the correctly classified datapoints
     good = (Y_ == Y)
     plt.scatter(X[good, 0], X[good, 1], c=colors[good],
-                s=sizes[good], marker='s', edgecolors='black')
+                s=sizes[good], marker='o', edgecolors='black')
 
     # draw the incorrectly classified datapoints
     bad = (Y_ != Y)
     plt.scatter(X[bad, 0], X[bad, 1], c=colors[bad],
-                s=sizes[bad], marker='o', edgecolors='black')
+                s=sizes[bad], marker='s', edgecolors='black')
 
 
 def class_to_onehot(Y):
@@ -216,11 +216,10 @@ if __name__ == "__main__":
     Y = myDummyDecision(X) > 0.5
 
     # graph the decision surface
-    # rect = (np.min(X, axis=0), np.max(X, axis=0))
-    # graph_surface(myDummyDecision, rect, offset=0)
+    rect = (np.min(X, axis=0), np.max(X, axis=0))
+    graph_surface(myDummyDecision, rect, offset=0.5)
 
     # graph the data points
-    # graph_data(X, Y_, Y, special=[])
-    graph_data(X, Y_, Y)
+    graph_data(X, Y_, Y, special=[])
 
     plt.show()
