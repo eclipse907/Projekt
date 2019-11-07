@@ -35,12 +35,13 @@ def fcann2_train(X, Y_):
         grad_W2 = np.dot(np.transpose(Gs2), hiddenLayer1)  # C x 5
         grad_b2 = np.sum(np.transpose(Gs2), axis=1) # C x 1
         Gh1 = np.transpose(np.dot(W2, np.transpose(Gs2)))  # N x 5
-        Gs1 = np.dot(Gh1, np.where(scores1 > 0, np.ones(scores1.shape), np.zeros(scores1.shape)))  # N x 5
+        Gs1 = Gh1 # N x 5
+        Gs1[hiddenLayer1 <= 0] = 0
         grad_W1 = np.dot(np.transpose(Gs1), X)  # 5 x D
         grad_b1 = np.sum(np.transpose(Gs1), axis=1)  # 5 x 1
-        W1 += -param_delta * grad_W1
+        W1 += -param_delta * np.transpose(grad_W1)
         b1 += -param_delta * grad_b1
-        W2 += -param_delta * grad_W2
+        W2 += -param_delta * np.transpose(grad_W2)
         b2 += -param_delta * grad_b2
     return W1, b1, W2, b2
 
