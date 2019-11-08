@@ -23,7 +23,7 @@ def binlogreg_train(X, Y_, param_niter=100, param_delta=0.1):
     for i in range(param_niter):
         scores = np.dot(X, w) + b
         probs = sigmoid(scores)
-        loss = -1 / N * np.sum(np.log(probs))
+        loss = -1 / N * np.sum(np.log(Y_ * probs + (1 - Y_) * (1 - probs)))
 
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     X, Y_ = data.sample_gauss_2d(2, 100)
 
     # train the model
-    w, b = binlogreg_train(X, Y_)
+    w, b = binlogreg_train(X, Y_, param_niter=1000)
 
     # evaluate the model on the training dataset
     probs = binlogreg_classify(X, w, b)
