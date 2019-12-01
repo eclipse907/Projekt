@@ -1,6 +1,7 @@
 import numpy as np
+from losses.LossFunction import *
 
-class L1SmoothLoss():
+class L1SmoothLoss(LossFunction):
 
   def __init__(self, weights, weight_decay, name):
     """

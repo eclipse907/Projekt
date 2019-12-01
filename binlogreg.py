@@ -1,10 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from L1SmoothLoss import *
 
 import data
 
-from L2Regularizer import *
+from regularizers.L2Regularizer import *
 
 def sigmoid(s):
     return np.exp(s) / (1 + np.exp(s))

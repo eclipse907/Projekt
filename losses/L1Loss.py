@@ -1,4 +1,4 @@
-from LossFunction import *
+from losses.LossFunction import *
 import numpy as np
 
 class L1Loss(LossFunction):

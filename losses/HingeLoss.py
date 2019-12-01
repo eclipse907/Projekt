@@ -1,4 +1,4 @@
-from LossFunction import *
+from losses.LossFunction import *
 
 class HingeLoss(LossFunction):
 
