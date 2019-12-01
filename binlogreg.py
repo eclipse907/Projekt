@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from L1SmoothLoss import *
 
 import data
 
@@ -69,25 +70,15 @@ def binlogreg_decfun(w, b):
 
     return classify
 
-
-def doTestSetCheck(tw, tb):
-    print("---------------------\nTEST")
-    testX, testY_ = data.sample_gauss_2d(2, 100)
-    #print("...testX="+str(testX[:5]))
-    print("...testY_=" + str(testY_))
-    testProbs = binlogreg_classify(X, tw, tb)
-    testY = testProbs > 0.5
-    print("...testY=" + str(testY))
-    # report performance
-    Taccuracy, Trecall, Tprecision = data.eval_perf_binary(testY, testY_)
-    AP = data.eval_AP(testY_[testProbs.argsort()])
-
-    print("w="+str(w) + ", b="+str(b))
-    print(Taccuracy, Trecall, Tprecision, AP)
-
 if __name__ == '__main__':
     np.random.seed(10)
-    LAMBDA_FACTOR = None
+
+    # w = np.random.randn(3)
+    # l1SmoothLoss = L1SmoothLoss(w, 1, "l1smooth")
+    # print("smooth l1 loss = ",l1SmoothLoss.forward())
+    # print()
+    # print("smooth l1 gradients = ", l1SmoothLoss.backward_params()[0][1])
+    LAMBDA_FACTOR = np.exp(-1)
     # get the training dataset
     n_samples = 400
     X, Y_ = data.sample_gauss_2d(2, n_samples)
@@ -100,11 +91,11 @@ if __name__ == '__main__':
     #print("...X=" + str(X[:5]))
     # print("...Y_=" + str(Y_))
 
-    # train the model
+    # # train the model
     w, b = binlogreg_train(Xtrain, Y_train, LAMBDA_FACTOR)
     # print("w=" + str(w) + ", b=" + str(b))
 
-    # evaluate the model on the train dataset
+    # # evaluate the model on the train dataset
     probs = binlogreg_classify(Xtrain, w, b)
     Y = probs > 0.5
     # print("...Y=" + str(Y))
@@ -113,7 +104,7 @@ if __name__ == '__main__':
     AP = data.eval_AP(Y_train[probs.argsort()])
     print("Train set:", accuracy, recall, precision, AP)
 
-    # evaluate the model on the test dataset
+    # # evaluate the model on the test dataset
     probs = binlogreg_classify(Xtest, w, b)
     Y = probs > 0.5
     # print("...Y=" + str(Y))
@@ -122,9 +113,7 @@ if __name__ == '__main__':
     AP = data.eval_AP(Y_test[probs.argsort()])
     print("Test set:", accuracy, recall, precision, AP)
 
-    # doTestSetCheck(w, b)
-
-    # graph the decision surface
+    # # graph the decision surface
     decfun = binlogreg_decfun(w, b)
     # decfun = lambda X: binlogreg_classify(X, w, b)
     bbox = (np.min(Xtest, axis=0), np.max(Xtest, axis=0))
