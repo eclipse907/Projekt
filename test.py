@@ -1,5 +1,8 @@
+import sys
+from builtins import list, str, enumerate
 from itertools import zip_longest
 import numpy as np
+import matplotlib.pyplot as plt
 import optimisation as opt
 
 
@@ -92,10 +95,9 @@ class PolynomialFunction:
 
 
 def main():
-    function = PolynomialFunction([1, 1, 1])
-    # opt.optimise("SGD", function, 0.1, 10000, 10000, is_to_be_plotted=True)
-    # opt.optimise("SGDM", function, 0.005, 50, 50, 0.05, is_to_be_plotted=True)
-    # opt.optimise("ADAM", function, 0.05, 50, is_to_be_plotted=True)
+    function = PolynomialFunction([1, 2, 1, 2, 1])
+    # opt.optimise("SGD", function, 0.1, 10000, 10000)
+    opt.optimise("SGDM", function, 0.005, 1, 1, 0.05)
 
 
 if __name__ == '__main__':
