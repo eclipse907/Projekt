@@ -46,7 +46,8 @@ class PolynomialFunction:
                             pass
         return self.__check_complete__(self.coefficients, powers)
 
-    def __check_complete__(self, coefficients, powers):
+    @staticmethod
+    def __check_complete__(coefficients, powers):
         try:
             factor = 0
             for index in range(len(powers)):
@@ -86,8 +87,6 @@ class PolynomialFunction:
         grad_fun = np.polyder(fun)
         return grad_fun
 
-
-
     def __random_set__(self, limit, number_of_samples, x):
         random_inputs = np.random.random_sample(number_of_samples)
         random_inputs = [element * limit - limit/2 for element in random_inputs]
@@ -97,7 +96,7 @@ class PolynomialFunction:
 
 def main():
     function = PolynomialFunction([1, 1, 1])
-    #opt.optimise("SGD", function, 0.1, 10000, 10000)
+    # opt.optimise("SGD", function, 0.1, 10000, 10000)
     opt.optimise("SGDM", function, 0.005, 50, 50, 0.05)
 
 
