@@ -6,7 +6,7 @@ from logreg import *
 
 if __name__ == '__main__':
 
-    np.random.seed(10)
+    np.random.seed(100)
     LAMBDA_FACTOR = np.exp(-3)
     n_samples = 400
 
@@ -35,8 +35,8 @@ if __name__ == '__main__':
 
         # # train the model
         # BIN logreg
-        w, b = binlogreg_train(Xtrain, Y_train, None)
-        #w, b = binlogreg_train(Xtrain, Y_train, LAMBDA_FACTOR)
+        #w, b = binlogreg_train(Xtrain, Y_train, None,  10000, 0.1)
+        w, b = binlogreg_train(Xtrain, Y_train, LAMBDA_FACTOR,  1000, 0.1)
 
         # # evaluate the model on the train dataset
         probs = binlogreg_classify(Xtrain, w, b)
@@ -79,29 +79,28 @@ if __name__ == '__main__':
         print(np.intersect1d(Xtrain, Xtest))
 
         # train the model
-        W, b = logreg_train(X, Y_, None)
-        #W, b = logreg_train(X, Y_, LAMBDA_FACTOR)
-
+        #W, b = logreg_train(X, Y_, None, 100, 0.1)
+        W, b = logreg_train(Xtrain, Y_train, LAMBDA_FACTOR, 100, 0.1)
         # # evaluate the model on the train dataset
         probs = logreg_classify(Xtrain, W, b)
-        Y = np.argwhere(np.around(probs))[:, 1]
+        Y = np.argmax(probs,axis=1)
 
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_train)
-        AP = data.eval_AP(Y_train[probs.argsort()])
-        print("Train set:", accuracy, recall, precision, AP)
+        #AP = data.eval_AP(Y_train[probs.argsort()])
+        print("Train set:", accuracy, recall, precision)#, AP)
 
         # # evaluate the model on the test dataset
         probs = logreg_classify(Xtest, W, b)
-        Y = np.argwhere(np.around(probs))[:, 1]
+        Y = np.argmax(probs,axis=1)
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_test)
-        AP = data.eval_AP(Y_test[probs.argsort()])
-        print("Test set:", accuracy, recall, precision, AP)
+        #AP = data.eval_AP(Y_test[probs.argsort()])
+        print("Test set:", accuracy, recall, precision)#, AP)
 
         # graph the decision surface
         decfun = logreg_decfun(W, b)
-        bbox = (np.min(X, axis=0), np.max(X, axis=0))
+        bbox = (np.min(Xtest, axis=0), np.max(Xtest, axis=0))
         data.graph_surface(decfun, bbox, offset=0.5)
 
         # graph the data points

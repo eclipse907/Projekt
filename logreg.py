@@ -16,6 +16,7 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
     D = X.shape[1]
     C = max(Y_) + 1
     W = np.random.randn(D, C)
+    print("before train: w =", W)
     b = np.zeros((1, C))
     # gradijentni spust (param_niter iteracija)
     #param_niter = 1000
@@ -65,6 +66,8 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
         # poboljšani parametri
         W += -param_delta * np.transpose(grad_W)
         b += -param_delta * np.transpose(grad_b)
+
+    print("after train: w =", W)
     return W, b
 
 def logreg_classify(X, W,b):
@@ -83,30 +86,5 @@ def logreg_decfun(W,b):
     return classify
 
 
-if __name__=="__main__":
-    np.random.seed(100)
-    # get the training dataset
-    X,Y_ = data.sample_gauss_2d(3, 200)
-
-    # train the model
-    W,b = logreg_train(X, Y_)
-
-    # evaluate the model on the training dataset
-    probs = logreg_classify (X, W,b)
-    Y = np.argwhere(np.around(probs))[:, 1]
 
 
-    # report performance
-    accuracy, recall, precision = data.eval_perf_multi(Y, Y_)
-    print (accuracy, recall, precision)
-
-    # graph the decision surface
-    decfun = logreg_decfun(W,b)
-    bbox = (np.min(X, axis=0), np.max(X, axis=0))
-    data.graph_surface(decfun, bbox, offset=0.5)
-
-    # graph the data points
-    data.graph_data(X, Y_, Y, special=[])
-
-    # show the plot
-    plt.show()
