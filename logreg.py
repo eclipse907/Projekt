@@ -1,8 +1,9 @@
 import data
 import numpy as np
 import matplotlib.pyplot as plt
+from regularizers.L2Regularizer import *
 
-def logreg_train(X, Y_):
+def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
     '''
         Argumenti
           X:  podatci, np.array NxD
@@ -17,8 +18,8 @@ def logreg_train(X, Y_):
     W = np.random.randn(D, C)
     b = np.zeros((1, C))
     # gradijentni spust (param_niter iteracija)
-    param_niter = 1000
-    param_delta = 0.3
+    #param_niter = 1000
+    #param_delta = 0.3
     for i in range(param_niter):
         # eksponencirane klasifikacijske mjere
         # pri računanju softmaksa obratite pažnju
@@ -38,6 +39,12 @@ def logreg_train(X, Y_):
         # gubitak
         loss = -(np.sum(logprobs) / N)  # scalar
 
+        L2 = None
+        if lambdaFactor is not None:
+            L2 = L2Regularizer(W, lambdaFactor, "l2reg_" + str(i))
+            l2RegLoss = L2.forward()
+            loss += l2RegLoss
+
         # dijagnostički ispis
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
@@ -49,6 +56,10 @@ def logreg_train(X, Y_):
 
         # gradijenti parametara
         grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
+        if lambdaFactor is not None:
+            l2RegGradW = L2.backward_params()[0][1]
+            grad_W += np.transpose(l2RegGradW)
+
         grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
 
         # poboljšani parametri
@@ -70,6 +81,7 @@ def logreg_decfun(W,b):
       probs = logreg_classify(X, W,b)
       return probs[:, 0]
     return classify
+
 
 if __name__=="__main__":
     np.random.seed(100)
