@@ -1,4 +1,8 @@
-class LossFunction():
+from abc import ABC, abstractmethod
 
+
+class LossFunction(ABC):
+
+    @abstractmethod
     def calculateLoss(self, yTarget, yEstimate):
-        raise NotImplementedError("Loss function not implemented")
+        pass

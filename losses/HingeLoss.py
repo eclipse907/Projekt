@@ -1,5 +1,6 @@
 from losses.LossFunction import *
 
+
 class HingeLoss(LossFunction):
 
     def calculateLoss(self, yTarget, yEstimate):
