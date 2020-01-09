@@ -49,7 +49,7 @@ def fcann2_train(X, Y_,lambdaFactor=None, param_niter=100, param_delta=0.1):
         grad_b2 = np.sum(np.transpose(Gs2), axis=1) # C x 1
         Gh1 = np.transpose(np.dot(W2, np.transpose(Gs2)))  # N x 5
         Gs1 = Gh1 # N x 5
-        Gs1[hiddenLayer1 <= 0] = 0
+        Gs1[Gs1 < 0] = 0
         grad_W1 = np.dot(np.transpose(Gs1), X)  # 5 x D
         if lambdaFactor is not None:
             l2RegGradW = L2_1.backward_params()[0][1]
