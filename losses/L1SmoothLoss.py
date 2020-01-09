@@ -16,7 +16,7 @@ class L1SmoothLoss(LossFunction):
         self.weight_decay = weight_decay
         self.name = name
 
-    def forward(self):
+    def forward(self, Y_, Y):
         """
          Returns:
           Scalar, smooth l1 loss.

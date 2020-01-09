@@ -6,7 +6,7 @@ from logreg import *
 
 if __name__ == '__main__':
 
-    np.random.seed(10)
+    np.random.seed(100)
     LAMBDA_FACTOR = np.exp(-3)
     n_samples = 400
 
@@ -79,25 +79,25 @@ if __name__ == '__main__':
         print(np.intersect1d(Xtrain, Xtest))
 
         # train the model
-        W, b = logreg_train(X, Y_, None)
+        W, b = logreg_train(Xtrain, Y_train, None, 100001, 0.1)
         #W, b = logreg_train(X, Y_, LAMBDA_FACTOR)
 
         # # evaluate the model on the train dataset
         probs = logreg_classify(Xtrain, W, b)
-        Y = np.argwhere(np.around(probs))[:, 1]
+        Y = np.argmax(probs, axis=1)
 
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_train)
-        AP = data.eval_AP(Y_train[probs.argsort()])
-        print("Train set:", accuracy, recall, precision, AP)
+        # AP = data.eval_AP(Y_train[probs.argsort()])
+        print("Train set:", accuracy, recall, precision) #, AP)
 
         # # evaluate the model on the test dataset
         probs = logreg_classify(Xtest, W, b)
-        Y = np.argwhere(np.around(probs))[:, 1]
+        Y = np.argmax(probs, axis=1)
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_test)
-        AP = data.eval_AP(Y_test[probs.argsort()])
-        print("Test set:", accuracy, recall, precision, AP)
+        # AP = data.eval_AP(Y_test[probs.argsort()])
+        print("Test set:", accuracy, recall, precision) #, AP)
 
         # graph the decision surface
         decfun = logreg_decfun(W, b)

@@ -4,5 +4,5 @@ import numpy as np
 
 class L2Loss(LossFunction):
 
-    def calculateLoss(self, yTarget, yEstimate):
-        return 1 / np.size(yTarget) * np.sum(np.square(yTarget - yEstimate))
+    def forward(self, Y_, Y):
+        return 1 / np.size(Y_) * np.sum(np.square(Y_ - Y))
