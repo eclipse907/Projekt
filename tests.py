@@ -88,12 +88,12 @@ if __name__ == '__main__':
 
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_train)
-        # AP = data.eval_AP(Y_train[probs.argsort()])
-        print("Train set:", accuracy, recall, precision) #, AP)
+        AP = data.eval_AP(Y_train[probs.argsort()])
+        print("Train set:", accuracy, recall, precision, AP)
 
         # # evaluate the model on the test dataset
         probs = logreg_classify(Xtest, W, b)
-        Y = np.argmax(probs, axis=1)
+        Y = np.argmax(probs,axis=1)
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_test)
         # AP = data.eval_AP(Y_test[probs.argsort()])
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
         # graph the decision surface
         decfun = logreg_decfun(W, b)
-        bbox = (np.min(X, axis=0), np.max(X, axis=0))
+        bbox = (np.min(Xtest, axis=0), np.max(Xtest, axis=0))
         data.graph_surface(decfun, bbox, offset=0.5)
 
         # graph the data points
