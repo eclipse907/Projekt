@@ -1,6 +1,8 @@
 import data
 import numpy as np
 import matplotlib.pyplot as plt
+
+from losses.L2Loss import L2Loss
 from regularizers.L2Regularizer import *
 
 def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
@@ -35,33 +37,38 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
 
         # logaritmirane vjerojatnosti razreda
         probs = expscores / sumexp.reshape((N, 1))  # N x C
-        logprobs = np.log(probs[range(N), Y_])  # N x 1
+        # logprobs = np.log(probs[range(N), Y_])  # N x 1
+        #
+        # # gubitak
+        # loss = -(np.sum(logprobs) / N)  # scalar
+        #
+        # L2 = None
+        # if lambdaFactor is not None:
+        #     L2 = L2Regularizer(W, lambdaFactor, "l2reg_" + str(i))
+        #     l2RegLoss = L2.forward()
+        #     loss += l2RegLoss
 
-        # gubitak
-        loss = -(np.sum(logprobs) / N)  # scalar
-
-        L2 = None
-        if lambdaFactor is not None:
-            L2 = L2Regularizer(W, lambdaFactor, "l2reg_" + str(i))
-            l2RegLoss = L2.forward()
-            loss += l2RegLoss
+        loss = L2Loss(Y_, None)
+        loss_components, loss_sum = loss.forward(probs)
 
         # dijagnostički ispis
         if i % 10 == 0:
-            print("iteration {}: loss {}".format(i, loss))
+            print("iteration {}: loss {}".format(i, loss_sum))
 
-        # derivacije komponenata gubitka po mjerama
-        Yij = np.zeros((N,C))
-        Yij[range(N), Y_] = 1
-        dL_ds = probs - Yij  # N x C
+        # # derivacije komponenata gubitka po mjerama
+        # Yij = np.zeros((N, C))
+        # Yij[range(N), Y_] = 1
+        # dL_ds = probs - Yij  # N x C
+
+        grad_W, grad_b = loss.backward(loss_components, X)
 
         # gradijenti parametara
-        grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
-        if lambdaFactor is not None:
-            l2RegGradW = L2.backward_params()[0][1]
-            grad_W += np.transpose(l2RegGradW)
+        # grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
+        # if lambdaFactor is not None:
+        #     l2RegGradW = L2.backward_params()[0][1]
+        #     grad_W += np.transpose(l2RegGradW)
 
-        grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
+        # grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
 
         # poboljšani parametri
         W += -param_delta * np.transpose(grad_W)

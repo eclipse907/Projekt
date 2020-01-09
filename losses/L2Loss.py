@@ -14,8 +14,10 @@ class L2Loss(LossFunction):
             regularized_loss += self.regularizer.forward()
         return [loss_components, regularized_loss]
 
-    def backward(self, loss):
-        grad = loss.clone()
+    def backward(self, loss, X):
+        dL_ds = self.Y - self.Y_oh
+        grad_W = np.dot(np.transpose(dL_ds), X) / X.shape[0]
         if self.regularizer:
-            grad += self.regularizer.backward_params()[0][1]
-        return grad
+            grad_W += self.regularizer.backward_params()[0][1]
+        grad_b = np.sum(np.transpose(dL_ds), axis=1) / X.shape[0]
+        return [grad_W, grad_b]

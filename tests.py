@@ -79,7 +79,7 @@ if __name__ == '__main__':
         print(np.intersect1d(Xtrain, Xtest))
 
         # train the model
-        W, b = logreg_train(Xtrain, Y_train, None, 100001, 0.1)
+        W, b = logreg_train(Xtrain, Y_train, None, 10000, 0.1)
         #W, b = logreg_train(X, Y_, LAMBDA_FACTOR)
 
         # # evaluate the model on the train dataset
@@ -88,8 +88,8 @@ if __name__ == '__main__':
 
         # report performance
         accuracy, recall, precision = data.eval_perf_multi(Y, Y_train)
-        AP = data.eval_AP(Y_train[probs.argsort()])
-        print("Train set:", accuracy, recall, precision, AP)
+        # AP = data.eval_AP(Y_train[probs.argsort()])
+        print("Train set:", accuracy, recall, precision)#, AP)
 
         # # evaluate the model on the test dataset
         probs = logreg_classify(Xtest, W, b)

@@ -14,7 +14,7 @@ class L1Loss(LossFunction):
             regularized_loss += self.regularizer.forward()
         return [loss_components, regularized_loss]
 
-    def backward(self, loss):
+    def backward(self, loss, X):
         grad = np.sign(self.Y - self.Y_oh)
         if self.regularizer:
             grad += self.regularizer.backward_params()[0][1]

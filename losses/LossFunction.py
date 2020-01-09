@@ -13,5 +13,5 @@ class LossFunction(ABC):
         pass
 
     @abstractmethod
-    def backward(self, loss):
+    def backward(self, loss, X):
         pass

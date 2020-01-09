@@ -21,7 +21,7 @@ class L1SmoothLoss(LossFunction):
             regularized_loss += self.regularizer.forward()
         return [lossAllWeights, regularized_loss]
 
-    def backward_params(self, loss):
+    def backward(self, loss, X):
         """
         Returns:
           Gradient of the smooth L1 loss with respect to the weights.

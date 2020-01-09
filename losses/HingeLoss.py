@@ -9,5 +9,5 @@ class HingeLoss(LossFunction):
         regularized_loss = np.sum(loss_components) + self.regularizer.forward()
         return [loss_components, regularized_loss]
 
-    def backward(self, loss):
+    def backward(self, loss, X):
         pass
