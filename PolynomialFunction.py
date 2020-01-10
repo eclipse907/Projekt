@@ -3,47 +3,55 @@ from builtins import list, str, enumerate
 from itertools import zip_longest
 import numpy as np
 import matplotlib.pyplot as plt
-import optimisation as opt
+import Optimisation as opt
 
 
 class PolynomialFunction:
 
     coefficients = []
 
-    def __init__(self, string):
-        self.function = string
-        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    def __init__(self, val):
+        if isinstance(val, str):
+            self.function = str
+            self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
                         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        self.signs = ['+', '-', '*']
+            self.__parse__(val, self.letters)
+        elif isinstance(val, []):
+            self.coefficients = val
 
-    def __init__(self, coefficients):
-        self.coefficients = coefficients
 
-    def __parse__(self):
-        for sign in self.signs:
-            self.function = self.function.replace(sign, ' ')
-            self.function = self.function.split()
-            self.function.sort(reverse = True)
-            powers = []
-            while self.function:
-                term = self.function.pop(0)
+    def __parse__(self, function, letters):
+        signs = ['+', '-', '*']
 
-                for letter in self.letters:
-                    if letter in term:
-                        x, y = term.split(letter)
-                        self.coefficients.append(int(x))
-                        if y != '':
-                            powers.append(int(y))
-                        else:
-                            powers.append(1)
+        for element in function:
+            if element in signs:
+                function = function.replace(element, ' ')
+        function = function.split()
+        function.sort(reverse = True)
+
+        powers = []
+        while function:
+            term = function.pop(0)
+
+            for letter in letters:
+                if letter in term:
+                    x, y = term.split(letter)
+                    if x != '':
+                        self.coefficients.append(x)
                     else:
-                        try:
-                            temp = int(term)
-                            self.coefficients.append(temp)
-                            powers.append(0)
-                            break
-                        except:
-                            pass
+                        self.coefficients.append(1)
+                    if y != '':
+                        powers.append(y)
+                    else:
+                        powers.append(1)
+                else:
+                    try:
+                        temp = int(term)
+                        self.coefficients.append(temp)
+                        powers.append(0)
+                        break
+                    except:
+                        pass
         return self.__check_complete__(self.coefficients, powers)
 
     @staticmethod
@@ -93,12 +101,3 @@ class PolynomialFunction:
         result = [self.__call__(element) for element in random_inputs]
         return result
 
-
-def main():
-    function = PolynomialFunction([1, 2, 1, 2, 1])
-    # opt.optimise("SGD", function, 0.1, 10000, 10000)
-    opt.optimise("SGDM", function, 0.005, 1, 1, 0.05)
-
-
-if __name__ == '__main__':
-    main()

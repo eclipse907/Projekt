@@ -1,15 +1,15 @@
-from animation import plot
+from Animation import plot
 import numpy as np
 
 
-def optimise(algorithm, function, ni, w0, num_of_iterations=10000, is_to_be_plotted=False, alpha=0, beta_1=0.9
+def optimise(algorithm, function, ni, w0, num_of_iterations=10000, is_to_be_plotted=True, alpha=0, beta_1=0.9
              , beta_2=0.999, epsilon=10e-8):
-    if algorithm is "SGD":
-        sgd(function, ni, w0, num_of_iterations, is_to_be_plotted)
-    elif algorithm is "SGDM":
-        sgdm(function, ni, w0, num_of_iterations, is_to_be_plotted, alpha)
-    elif algorithm is "ADAM":
-        adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon)
+    if algorithm == "SGD":
+        return sgd(function, ni, w0, num_of_iterations, is_to_be_plotted)
+    elif algorithm == "SGDM":
+        return sgdm(function, ni, w0, num_of_iterations, is_to_be_plotted, alpha)
+    elif algorithm == "ADAM":
+        return adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon)
 
 
 def sgd(function, ni, w0, num_of_iterations, is_to_be_plotted):
@@ -26,7 +26,7 @@ def sgd(function, ni, w0, num_of_iterations, is_to_be_plotted):
     iterations = 0
     values_w = []
     gradient = function.__gradient__()(w)
-    while abs(gradient) >= 0.001 or iterations < num_of_iterations:
+    while abs(gradient) >= 0.01 or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         w = w - ni * gradient
         values_w.append(w)
@@ -52,7 +52,7 @@ def sgdm(function, ni, w0, num_of_iterations, is_to_be_plotted=False, alpha=0.05
     dw = 0
     values_w = []
     gradient = function.__gradient__()(w)
-    while abs(gradient) >= 0.001 or iterations < num_of_iterations:
+    while abs(gradient) >= 0.01 or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         dw = alpha * dw - ni * gradient
         w = w + dw
@@ -82,7 +82,7 @@ def adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, 
     gradient = function.__gradient__()(w)
     m = 0
     v = 0
-    while abs(gradient) >= 0.001 or iterations < num_of_iterations:
+    while abs(gradient) >= 0.01 or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         m = beta_1 * m + (1 - beta_1) * gradient
         v = beta_2 * v + (1 - beta_2) * np.power(gradient, 2)
