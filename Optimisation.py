@@ -2,33 +2,33 @@ from Animation import plot
 import numpy as np
 
 
-def optimise(algorithm, function, ni, w0, num_of_iterations=10000, is_to_be_plotted=True, alpha=0, beta_1=0.9
+def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations=10000, is_to_be_plotted=True, alpha=0, beta_1=0.9
              , beta_2=0.999, epsilon=10e-8):
     if algorithm == "SGD":
-        return sgd(function, ni, w0, num_of_iterations, is_to_be_plotted)
+        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted)
     elif algorithm == "SGDM":
-        return sgdm(function, ni, w0, num_of_iterations, is_to_be_plotted, alpha)
+        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, alpha)
     elif algorithm == "ADAM":
-        return adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon)
+        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon)
 
 
-def sgd(function, ni, w0, num_of_iterations, is_to_be_plotted):
+def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted):
     """
 
     :param function: function to optimise
-    :param ni: learning rate
-    :param w0: initial point
+    :param learning_rate: learning rate
+    :param initial_point: initial point
     :param num_of_iterations: number of iterations
     :param is_to_be_plotted: boolean marks what has to be plotted
     :return: final point in which function value is the minimum
     """
-    w = w0
+    w = initial_point
     iterations = 0
     values_w = []
     gradient = function.__gradient__()(w)
     while abs(gradient) >= 0.01 or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
-        w = w - ni * gradient
+        w = w - learning_rate * gradient
         values_w.append(w)
         iterations += 1
     if is_to_be_plotted:
@@ -36,25 +36,25 @@ def sgd(function, ni, w0, num_of_iterations, is_to_be_plotted):
     return w
 
 
-def sgdm(function, ni, w0, num_of_iterations, is_to_be_plotted=False, alpha=0.05):
+def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted=False, alpha=0.05):
     """
 
     :param function: function to optimise
-    :param ni: learning rate
-    :param w0: initial point
+    :param learning_rate: learning rate
+    :param initial_point: initial point
     :param num_of_iterations: number of iterations
     :param is_to_be_plotted: boolean marks what has to be plotted
     :param alpha: momentum
     :return: final point in which function value is the minimum
     """
-    w = w0
+    w = initial_point
     iterations = 0
     dw = 0
     values_w = []
     gradient = function.__gradient__()(w)
     while abs(gradient) >= 0.01 or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
-        dw = alpha * dw - ni * gradient
+        dw = alpha * dw - learning_rate * gradient
         w = w + dw
         values_w.append(w)
         iterations += 1
@@ -63,12 +63,12 @@ def sgdm(function, ni, w0, num_of_iterations, is_to_be_plotted=False, alpha=0.05
     return w
 
 
-def adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon):
+def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon):
     """
 
     :param function: function to optimise
-    :param ni: learning rate
-    :param w0: initial point
+    :param learning_rate: learning rate
+    :param initial_point: initial point
     :param num_of_iterations: number of iterations
     :param is_to_be_plotted: boolean marks what has to be plotted
     :param beta_1: exponential decay rate for the first moment
@@ -76,7 +76,7 @@ def adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, 
     :param epsilon: used as a divisor instead of zero
     :return: final point in which function value is the minimum
     """
-    w = w0
+    w = initial_point
     iterations = 0
     values_w = []
     gradient = function.__gradient__()(w)
@@ -88,7 +88,7 @@ def adam(function, ni, w0, num_of_iterations, is_to_be_plotted, beta_1, beta_2, 
         v = beta_2 * v + (1 - beta_2) * np.power(gradient, 2)
         m_hat = m / (1 - np.power(beta_1, iterations + 1))
         v_hat = v / (1 - np.power(beta_2, iterations + 1))
-        w = w - ni * m_hat / (np.sqrt(v_hat) + epsilon)
+        w = w - learning_rate * m_hat / (np.sqrt(v_hat) + epsilon)
         values_w.append(w)
         iterations += 1
     if is_to_be_plotted:

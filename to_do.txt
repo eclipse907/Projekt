@@ -1,0 +1,11 @@
++ 1. broj iteracija vam je prevelik (200 je dosta)
+2. popravite bug u uvjetima izlaska iz optimizacijske petlje
++ 3. omogućite da se algoritam i parametri zadaju iz naredbenog retka (koristite argparse)
+4. podesite defaultne parametre optimizacijskih algoritama tako da se vide
+   prednosti sgdm-a nad sgd-om te adama nad sgd-om
++ 5. popravite warning vezan uz operator is
+6. ilustrirajte funkcionalnost razreda PolynomialFunction primjerima
+* 7. popravite imena (što znači ni?)
+8. zapakirajte algoritme u komponente podesne za integraciju u veći sustav
+   (neka optimizacijski objekt nudi metodu __call__ koja prima gradijente a vraća update, kao što sam opisao u komentaru na githubu)
+9. poopćite za funkcije dvije varijable (samo budete imali puno vemena i ako vam se ta ideja posebno svidi)
