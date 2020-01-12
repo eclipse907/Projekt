@@ -9,7 +9,7 @@ class L1SmoothLoss(LossFunction):
          Returns:
           Scalar, smooth l1 loss.
         """
-        self.Y = Y
+        self.logits = Y
         self.Y_oh = np.zeros(Y.shape)
         self.Y_oh[range(Y.shape[0]), self.Y_] = 1
         lossAllWeights = np.where(np.abs(Y - self.Y_oh) < 1,
@@ -18,18 +18,18 @@ class L1SmoothLoss(LossFunction):
         # print(lossAllWeights)
         regularized_loss = np.sum(lossAllWeights)
         if self.regularizer:
-            regularized_loss += self.regularizer.forward()
+            regularized_loss += sum((reg.forward() for reg in self.regularizer))
         return [lossAllWeights, regularized_loss]
 
-    def backward(self, loss, X):
+    def backward(self):
         """
         Returns:
           Gradient of the smooth L1 loss with respect to the weights.
         """
 
-        gradAllWeights = np.where(np.abs(self.Y - self.Y_oh) < 1,
-                                  loss,
-                                  np.sign(self.Y - self.Y_oh))
+        gradAllWeights = np.where(np.abs(self.logits - self.Y_oh) < 1,
+                                  self.logits - self.Y_oh,
+                                  np.sign(self.logits - self.Y_oh))
         # print(gradAllWeights)
         if self.regularizer:
             gradAllWeights += self.regularizer.backward_params()[0][1]

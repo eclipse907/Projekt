@@ -23,20 +23,24 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
     # gradijentni spust (param_niter iteracija)
     #param_niter = 1000
     #param_delta = 0.3
+
+    regularizers = [L2Regularizer(W, lambdaFactor, "l2reg")]
+    loss = L2Loss(Y_, None)
+
     for i in range(param_niter):
         # eksponencirane klasifikacijske mjere
         # pri računanju softmaksa obratite pažnju
         # na odjeljak 4.1 udžbenika
         # (Deep Learning, Goodfellow et al)!
         scores = np.dot(X, W) + b  # N x C
-        maxScores = np.amax(scores, axis=1)
-        expscores = np.exp(scores - maxScores.reshape((N, 1))) # N x C
-
-        # nazivnik sofmaksa
-        sumexp = np.sum(expscores, axis=1)  # N x 1
-
-        # logaritmirane vjerojatnosti razreda
-        probs = expscores / sumexp.reshape((N, 1))  # N x C
+        # maxScores = np.amax(scores, axis=1)
+        # expscores = np.exp(scores - maxScores.reshape((N, 1))) # N x C
+        #
+        # # nazivnik sofmaksa
+        # sumexp = np.sum(expscores, axis=1)  # N x 1
+        #
+        # # logaritmirane vjerojatnosti razreda
+        # probs = expscores / sumexp.reshape((N, 1))  # N x C
         # logprobs = np.log(probs[range(N), Y_])  # N x 1
         #
         # # gubitak
@@ -48,8 +52,7 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
         #     l2RegLoss = L2.forward()
         #     loss += l2RegLoss
 
-        loss = L2Loss(Y_, None)
-        loss_components, loss_sum = loss.forward(probs)
+        loss_sum = loss.forward(scores)
 
         # dijagnostički ispis
         if i % 10 == 0:
@@ -60,15 +63,15 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
         # Yij[range(N), Y_] = 1
         # dL_ds = probs - Yij  # N x C
 
-        grad_W, grad_b = loss.backward(loss_components, X)
+        dL_ds = loss.backward()
 
         # gradijenti parametara
-        # grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
         # if lambdaFactor is not None:
         #     l2RegGradW = L2.backward_params()[0][1]
-        #     grad_W += np.transpose(l2RegGradW)
+        #     dL_ds += np.transpose(l2RegGradW)
 
-        # grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
+        grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
+        grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
 
         # poboljšani parametri
         W += -param_delta * np.transpose(grad_W)
