@@ -1,6 +1,11 @@
 from Animation import plot
 import numpy as np
 
+precision = 0.01
+
+
+# add default parameters
+
 
 def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations=10000, is_to_be_plotted=True, alpha=0, beta_1=0.9
              , beta_2=0.999, epsilon=10e-8):
@@ -26,7 +31,7 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     iterations = 0
     values_w = []
     gradient = function.__gradient__()(w)
-    while abs(gradient) >= 0.01 or iterations < num_of_iterations:
+    while abs(gradient) >= precision or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         w = w - learning_rate * gradient
         values_w.append(w)
@@ -52,7 +57,7 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     dw = 0
     values_w = []
     gradient = function.__gradient__()(w)
-    while abs(gradient) >= 0.01 or iterations < num_of_iterations:
+    while abs(gradient) >= precision or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         dw = alpha * dw - learning_rate * gradient
         w = w + dw
@@ -82,7 +87,7 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     gradient = function.__gradient__()(w)
     m = 0
     v = 0
-    while abs(gradient) >= 0.01 or iterations < num_of_iterations:
+    while abs(gradient) >= precision or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         m = beta_1 * m + (1 - beta_1) * gradient
         v = beta_2 * v + (1 - beta_2) * np.power(gradient, 2)

@@ -34,9 +34,10 @@ def check_arguments(options):
 
 
 def main():
+
     parser = argparse.ArgumentParser(
-        description='Choose an optimising algorithm, function to optimise and parameters: learning rate, initial point and number of iterations: ')
-    parser.add_argument('-algo', '--optimising algorithm', type=str, action="store", nargs='?', help="Chosen algorithm",
+        description='Choose an optimising algorithm (-algo / --algorithm), function to optimise (-if / --input_function) and (optional) parameters: learning rate (-lr / --learning_rate), initial point (-ip / --initial_point) and number of iterations (-it / --iterations): ')
+    parser.add_argument('-algo', '--algorithm', type=str, action="store", nargs='?', help="Chosen algorithm",
                         dest="algorithm")
     parser.add_argument('-if', '--input_function', type=str, action="store", nargs='?', help="Function to optimise",
                         dest="input_function")
@@ -46,6 +47,8 @@ def main():
                         help="Initial point of the algorithm", dest="initial_point")
     parser.add_argument('-it', '--iterations', type=int, action="store", nargs='?',
                         help="Number of iterations for the algorithm", dest="iterations")
+
+    print("Choose an optimising algorithm (-algo / --algorithm), function to optimise (-if / --input_function) and (optional) parameters: learning rate (-lr / --learning_rate), initial point (-ip / --initial_point) and number of iterations (-it / --iterations):")
     options = parser.parse_args()
 
     check_arguments(options)
@@ -59,7 +62,7 @@ def main():
     print("Given function: " + str(
         options.input_function) + " Choosen algorithm: " + algorithm + " Learning rate: " + str(
         learning_rate) + " Inital point: " + str(initial_point) + " Number of iterations: " + str(num_of_iterations))
-    print(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations))
+    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations)))
 
 
 """default values

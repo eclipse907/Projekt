@@ -17,9 +17,6 @@ class PolynomialFunction:
                         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
             self.__parse__(val, self.letters)
 
-
-
-
     def __parse__(self, function, letters):
         signs = ['+', '-', '*']
 
@@ -27,7 +24,7 @@ class PolynomialFunction:
             if element in signs:
                 function = function.replace(element, ' ')
         function = function.split()
-        function.sort(reverse = True)
+        function.sort(reverse=True)
 
         powers = []
         while function:
@@ -81,15 +78,16 @@ class PolynomialFunction:
     def __add__(self, other):
         c1 = self.coefficients[::-1]
         c2 = other.coefficients[::-1]
-        result = [sum(t) for t in zip_longest(c1, c2, fillvalue = 0)]
+        result = [sum(t) for t in zip_longest(c1, c2, fillvalue=0)]
         return PolynomialFunction(*result)
 
     def __sub__(self, other):
         c1 = self.coefficients[::-1]
         c2 = other.coefficients[::-1]
-        result = [t1 - t2 for t1, t2 in zip_longest(c1, c2, fillvalue = 0)]
+        result = [t1 - t2 for t1, t2 in zip_longest(c1, c2, fillvalue=0)]
         return PolynomialFunction(result)
 
+    #we've got a bug here
     def __gradient__(self):
         fun = np.poly1d(self.coefficients)
         grad_fun = np.polyder(fun)
