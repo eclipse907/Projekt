@@ -55,7 +55,7 @@ def main():
                         help="Initial point of the algorithm", dest="initial_point")
     parser.add_argument('-it', '--iterations', type=int, action="store", nargs='?',
                         help="Number of iterations for the algorithm", dest="iterations")
-    parser.add_argument('-momentum', '--momentum', type=float, action="store", nargs='?', help="Chosen momentum"
+    parser.add_argument('-mom', '--momentum', type=float, action="store", nargs='?', help="Chosen momentum"
                         , dest="momentum")
     parser.add_argument('-b1', '--beta1', type=float, action="store", nargs='?', dest="beta1"
                         , help="Chosen exponential decay for the first moment")
@@ -73,6 +73,8 @@ def main():
     momentum = options.momentum
     beta1 = options.beta_1
     beta2 = options.beta_2
+
+    is_to_be_plotted = True
 
     print("Given function: " + str(
         options.input_function) + " Choosen algorithm: " + algorithm + " Learning rate: " + str(

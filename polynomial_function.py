@@ -7,11 +7,11 @@ class PolynomialFunction:
     coefficients = []
 
     def __init__(self, val):
-        if isinstance(val, str):
-            self.function = str
-            self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+        val.replace(" ", "")
+        self.function = str
+        self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
                         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-            self.__parse__(val, self.letters)
+        self.__parse__(val, self.letters)
 
     def __call__(self, x):
         return np.polyval(self.coefficients, x)
