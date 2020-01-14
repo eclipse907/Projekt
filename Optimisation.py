@@ -7,14 +7,15 @@ precision = 0.01
 # add default parameters
 
 
-def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations=10000, is_to_be_plotted=True, alpha=0, beta_1=0.9
-             , beta_2=0.999, epsilon=10e-8):
+def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, alpha, beta_1
+             , beta_2, epsilon):
     if algorithm == "SGD":
         return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted)
     elif algorithm == "SGDM":
         return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, alpha)
     elif algorithm == "ADAM":
-        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon)
+        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2
+                    , epsilon)
 
 
 def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted):
