@@ -4,19 +4,20 @@ import numpy as np
 precision = 0.01
 
 
-def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta_1, beta_2, precision=0.01, epsilon=1e-8):
+def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta1
+             , beta2, epsilon=1e-8):
     if algorithm == "SGD":
-        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision)
+        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted)
     elif algorithm == "SGDM":
-        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, precision)
+        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum)
     elif algorithm == "ADAM":
-        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon, precision)
+        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta1, beta2
+                    , epsilon)
 
 
-def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision):
+def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted):
     """
 
-    :param precision:
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start
@@ -24,26 +25,25 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     :param is_to_be_plotted: boolean marks if the function will be plotted
     :return: final point in which function value is the minimum
     """
-    w = initial_point
+    domain_point = initial_point
     iterations = 0
-    values_w = []
-    gradient = function.__gradient__()(w)
+    domain_point_vector = []
+    gradient = function.__gradient__()(domain_point)
 
     while abs(gradient) >= precision or iterations < num_of_iterations:
-        gradient = function.__gradient__()(w)
-        w = w - learning_rate * gradient
-        values_w.append(w)
+        gradient = function.__gradient__()(domain_point)
+        domain_point = domain_point - learning_rate * gradient
+        domain_point_vector.append(domain_point)
         iterations += 1
 
     if is_to_be_plotted:
-        plot(function, values_w, -50, 50)
+        plot(function, domain_point_vector, -50, 50)
 
-    return w
+    return domain_point
 
 
 def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted=False, momentum=0.05):
     """
-
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start
@@ -52,29 +52,27 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     :param momentum: the value which denotes how strongly will momentum influence the iteration result
     :return: final point in which function value is the minimum
     """
-    w = initial_point
+    domain_point = initial_point
     iterations = 0
-    dw = 0
-    values_w = []
-    gradient = function.__gradient__()(w)
+    domain_point_derivative = 0
+    domain_point_vector = []
+    gradient = function.__gradient__()(domain_point)
 
     while abs(gradient) >= precision or iterations < num_of_iterations:
-        gradient = function.__gradient__()(w)
-        dw = momentum * dw - learning_rate * gradient
-        w = w + dw
-        values_w.append(w)
+        gradient = function.__gradient__()(domain_point)
+        domain_point_derivative = momentum * domain_point_derivative - learning_rate * gradient
+        domain_point = domain_point + domain_point_derivative
+        domain_point_vector.append(domain_point)
         iterations += 1
 
     if is_to_be_plotted:
-        plot(function, values_w, -50, 50)
+        plot(function, domain_point_vector, -50, 50)
 
-    return w
+    return domain_point
 
 
-def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon, precision):
+def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon):
     """
-
-    :param precision:
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start
@@ -85,24 +83,25 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     :param epsilon: used as a divisor instead of zero
     :return: final point in which function value is the minimum
     """
-    w = initial_point
+    domain_point = initial_point
     iterations = 0
-    values_w = []
-    gradient = function.__gradient__()(w)
+    domain_point_vector = []
+    gradient = function.__gradient__()(domain_point)
     first_moment_vector = 0
     second_moment_vector = 0
 
     while abs(gradient) >= precision or iterations < num_of_iterations:
-        gradient = function.__gradient__()(w)
+        gradient = function.__gradient__()(domain_point)
         first_moment_vector = beta_1 * first_moment_vector + (1 - beta_1) * gradient
         second_moment_vector = beta_2 * second_moment_vector + (1 - beta_2) * np.power(gradient, 2)
         computational_first_moment_vector = first_moment_vector / (1 - np.power(beta_1, iterations + 1))
         computational_second_moment_vector = second_moment_vector / (1 - np.power(beta_2, iterations + 1))
-        w = w - learning_rate * computational_first_moment_vector / (np.sqrt(computational_second_moment_vector) + epsilon)
-        values_w.append(w)
+        domain_point = domain_point - learning_rate * computational_first_moment_vector / (np.sqrt(computational_second_moment_vector)
+                                                                     + epsilon)
+        domain_point_vector.append(domain_point)
         iterations += 1
 
     if is_to_be_plotted:
-        plot(function, values_w, -50, 50)
+        plot(function, domain_point_vector, -50, 50)
 
-    return w
+    return domain_point

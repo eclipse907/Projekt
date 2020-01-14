@@ -3,13 +3,14 @@ import numpy as np
 
 
 class PolynomialFunction:
+
     coefficients = []
 
     def __init__(self, val):
         if isinstance(val, str):
             self.function = str
             self.letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-                            'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+                        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
             self.__parse__(val, self.letters)
 
     def __parse__(self, function, letters):
@@ -22,9 +23,7 @@ class PolynomialFunction:
         function.sort(reverse=True)
 
         powers = []
-        while function:
-            term = function.pop(0)
-
+        for term in function:
             for letter in letters:
                 if letter in term:
                     x, y = term.split(letter)
@@ -33,7 +32,7 @@ class PolynomialFunction:
                     else:
                         self.coefficients.append(1)
                     if y != '':
-                        powers.append(y[1:])
+                        powers.append(y[1::])
                     else:
                         powers.append(1)
                 else:

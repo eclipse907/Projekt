@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 
-from PolynomialFunction import PolynomialFunction
-import Optimisation as opt
+from polynomial_function import PolynomialFunction
+import optimisation as opt
 import argparse
 
 
 def check_arguments(options):
-    if options.algorithm == "SGD":
+    if str(options.algorithm).upper() == "SGD":
         if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
             options.initial_point = 50
         if options.iterations is None:
             options.iterations = 200
-    elif options.algorithm == "SGDM":
-        if options.learning_rate is None:
+    elif str(options.algorithm).upper() == "SGDM":
+=        if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
-            options.initial_point = 10
+            options.initial_point = 0
         if options.iterations is None:
             options.iterations = 200
         if options.momentum is None:
             options.momentum = 0.9
-    elif options.algorithm == "ADAM":
+    elif str(options.algorithm).upper() == "ADAM":
         if options.learning_rate is None:
             options.learning_rate = 0.1
         if options.initial_point is None:
@@ -77,7 +77,8 @@ def main():
     if algorithm == "ADAM":
         print(" Exponential decays for first and second momentum: " + str(beta_1) + ", " + str(beta_2))
 
-    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, True, momentum, beta_1, beta_2)))
+    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, True
+                                         , momentum, beta_1, beta_2)))
 
 
 if __name__ == '__main__':
