@@ -1,4 +1,5 @@
 import numpy as np
+import polynomial_function
 
 
 class Optimizator:

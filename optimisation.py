@@ -1,4 +1,4 @@
-from Animation import plot
+from animation import plot
 import numpy as np
 
 precision = 0.01

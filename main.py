@@ -14,7 +14,7 @@ def check_arguments(options):
         if options.iterations is None:
             options.iterations = 200
     elif str(options.algorithm).upper() == "SGDM":
-=        if options.learning_rate is None:
+        if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
             options.initial_point = 0
@@ -58,7 +58,7 @@ def main():
     parser.add_argument('-b2', '--beta_2', type=float, action="store", nargs='?', dest="beta_2", help="Chosen exponential decay rate for the second moment")
 
     options = parser.parse_args()
-    options = check_arguments(options)
+    check_arguments(options)
 
     function = PolynomialFunction(options.input_function)
     algorithm = options.algorithm.upper()
