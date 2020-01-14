@@ -1,3 +1,4 @@
+from builtins import list, str, enumerate
 from builtins import str
 from itertools import zip_longest
 import numpy as np
