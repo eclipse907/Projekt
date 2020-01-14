@@ -15,8 +15,8 @@ def fcann2_train(X, Y_):
     b1 = np.random.randn(1, 5)
     W2 = np.random.randn(5, C)
     b2 = np.random.randn(1, C)
-    param_niter = 100000
-    param_delta = 0.05
+    param_niter = 50000
+    param_delta = 0.17
     for i in range(param_niter):
         scores1 = np.dot(X, W1) + b1  # N x 5
         hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
@@ -32,13 +32,12 @@ def fcann2_train(X, Y_):
         Yij = np.zeros((N, C))
         Yij[range(N), Y_] = 1
         Gs2 = probs - Yij  # N x C
-        grad_W2 = np.dot(np.transpose(Gs2), hiddenLayer1)  # C x 5
-        grad_b2 = np.sum(np.transpose(Gs2), axis=1) # C x 1
+        grad_W2 = np.dot(np.transpose(Gs2), hiddenLayer1) / N  # C x 5
+        grad_b2 = np.sum(np.transpose(Gs2), axis=1) / N # C x 1
         Gh1 = np.transpose(np.dot(W2, np.transpose(Gs2)))  # N x 5
-        Gs1 = Gh1 # N x 5
-        Gs1[Gs1 < 0] = 0
-        grad_W1 = np.dot(np.transpose(Gs1), X)  # 5 x D
-        grad_b1 = np.sum(np.transpose(Gs1), axis=1)  # 5 x 1
+        Gs1 = np.where(scores1 < 0, 0, Gh1) # N x 5
+        grad_W1 = np.dot(np.transpose(Gs1), X) / N  # 5 x D
+        grad_b1 = np.sum(np.transpose(Gs1), axis=1) / N  # 5 x 1
         W1 += -param_delta * np.transpose(grad_W1)
         b1 += -param_delta * grad_b1
         W2 += -param_delta * np.transpose(grad_W2)
@@ -64,7 +63,7 @@ def fcann2_decfun(W1, b1, W2, b2):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    X, Y_ = data.sample_gmm_2d(6, 2, 10)
+    X, Y_ = data.sample_gmm_2d(6, 2, 100)
     W1, b1, W2, b2 = fcann2_train(X, Y_)
     probs = fcann2_classify(X, W1, b1, W2, b2)
     Y = np.argwhere(np.around(probs))[:, 1]
