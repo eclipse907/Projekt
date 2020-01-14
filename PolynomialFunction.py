@@ -1,9 +1,6 @@
-import sys
-from builtins import list, str, enumerate
+from builtins import str
 from itertools import zip_longest
 import numpy as np
-import matplotlib.pyplot as plt
-import Optimisation as opt
 
 
 class PolynomialFunction:

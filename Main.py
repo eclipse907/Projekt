@@ -26,15 +26,15 @@ def check_arguments(options):
            # options.alpha = Hrvoje odaberi
     elif options.algorithm == "ADAM":
         if options.learning_rate is None:
-            options.learning_rate = 0.02
+            options.learning_rate = 0.001
         if options.initial_point is None:
             options.initial_point = 10
         if options.iterations is None:
             options.iterations = 200
         if options.beta_1 is None:
-            # options.beta_1 = Hrvoje odaberi
+            options.beta_1 = 0.9
         if options.beta_2 is None:
-            # options.beta_2 = Hrvoje odaberi
+            options.beta_2 = 0.999
     else:
         raise Exception('Illegal algorithm - choose a valid algorithm [SGD, SGDM, ADAM]')
     return options
