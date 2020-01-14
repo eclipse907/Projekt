@@ -32,13 +32,16 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     iterations = 0
     values_w = []
     gradient = function.__gradient__()(w)
+
     while abs(gradient) >= precision or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         w = w - learning_rate * gradient
         values_w.append(w)
         iterations += 1
+
     if is_to_be_plotted:
         plot(function, values_w, -50, 50)
+
     return w
 
 
@@ -58,14 +61,17 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     dw = 0
     values_w = []
     gradient = function.__gradient__()(w)
+
     while abs(gradient) >= precision or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
         dw = momentum * dw - learning_rate * gradient
         w = w + dw
         values_w.append(w)
         iterations += 1
+
     if is_to_be_plotted:
         plot(function, values_w, -50, 50)
+
     return w
 
 
@@ -86,17 +92,20 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     iterations = 0
     values_w = []
     gradient = function.__gradient__()(w)
-    m = 0
-    v = 0
+    first_moment_vector = 0
+    second_moment_vector = 0
+
     while abs(gradient) >= precision or iterations < num_of_iterations:
         gradient = function.__gradient__()(w)
-        m = beta_1 * m + (1 - beta_1) * gradient
-        v = beta_2 * v + (1 - beta_2) * np.power(gradient, 2)
-        m_hat = m / (1 - np.power(beta_1, iterations + 1))
-        v_hat = v / (1 - np.power(beta_2, iterations + 1))
-        w = w - learning_rate * m_hat / (np.sqrt(v_hat) + epsilon)
+        first_moment_vector = beta_1 * first_moment_vector + (1 - beta_1) * gradient
+        second_moment_vector = beta_2 * second_moment_vector + (1 - beta_2) * np.power(gradient, 2)
+        computational_first_moment_vector = first_moment_vector / (1 - np.power(beta_1, iterations + 1))
+        computational_second_moment_vector = second_moment_vector / (1 - np.power(beta_2, iterations + 1))
+        w = w - learning_rate * computational_first_moment_vector / (np.sqrt(computational_second_moment_vector) + epsilon)
         values_w.append(w)
         iterations += 1
+
     if is_to_be_plotted:
         plot(function, values_w, -50, 50)
+
     return w
