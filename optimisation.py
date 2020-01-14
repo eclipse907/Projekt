@@ -2,8 +2,8 @@ from animation import plot
 import numpy as np
 
 
-def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision, momentum
-             , beta1, beta2, epsilon=1e-8):
+def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum
+             , beta1, beta2, epsilon=1e-8, precision=0.1):
     if algorithm == "SGD":
         return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision)
     elif algorithm == "SGDM":

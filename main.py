@@ -82,8 +82,7 @@ def main():
     if algorithm == "ADAM":
         print(" Exponential decays for first and second momentum: " + str(beta_1) + ", " + str(beta_2))
 
-    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, True
-                                         , momentum, beta_1, beta_2)))
+    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, True, momentum, beta_1, beta_2)))
 
 
 if __name__ == '__main__':

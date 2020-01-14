@@ -63,11 +63,6 @@ class PolynomialFunction:
                     i += 1
         return coefficients
 
-
-
-
-        return coefficients
-
     def __gradient__(self):
         fun = np.poly1d(self.coefficients)
         grad_fun = np.polyder(fun)
