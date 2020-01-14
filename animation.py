@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import optimisation
+
 
 def plot(function, values, min_x, max_x):
     x = np.linspace(min_x, max_x, 50, endpoint=True)

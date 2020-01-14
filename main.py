@@ -41,8 +41,10 @@ def check_arguments(options):
 def main():
 
     parser = argparse.ArgumentParser(
-        description='Choose an optimising algorithm (-algo / --algorithm), function to optimise (-if / --input_function) and (optional) parameters: learning rate (-lr / --learning_rate), '
-                    'initial point (-ip / --initial_point), number of iterations (-it / --iterations), momentum (-momentum) for SGD and decays (-b1, -b2) for ADAM: ')
+        description='Choose an optimising algorithm (-algo / --algorithm), function to optimise '
+                    '(-if / --input_function) and (optional) parameters: learning rate (-lr / --learning_rate), '
+                    'initial point (-ip / --initial_point), number of iterations (-it / --iterations)'
+                    ', momentum (-momentum) for SGD and decays (-b1, -b2) for ADAM: ')
     parser.add_argument('-algo', '--algorithm', type=str, action="store", nargs='?', help="Chosen algorithm",
                         dest="algorithm")
     parser.add_argument('-if', '--input_function', type=str, action="store", nargs='?', help="Function to optimise",
@@ -53,9 +55,12 @@ def main():
                         help="Initial point of the algorithm", dest="initial_point")
     parser.add_argument('-it', '--iterations', type=int, action="store", nargs='?',
                         help="Number of iterations for the algorithm", dest="iterations")
-    parser.add_argument('-momentum', '--momentum', type=float, action="store", nargs='?', help="Chosen momentum", dest="momentum")
-    parser.add_argument('-b1', '--beta_1', type=float, action="store", nargs='?', dest="beta_1", help="Chosen exponential decay for the first moment")
-    parser.add_argument('-b2', '--beta_2', type=float, action="store", nargs='?', dest="beta_2", help="Chosen exponential decay rate for the second moment")
+    parser.add_argument('-momentum', '--momentum', type=float, action="store", nargs='?', help="Chosen momentum"
+                        , dest="momentum")
+    parser.add_argument('-b1', '--beta_1', type=float, action="store", nargs='?', dest="beta_1"
+                        , help="Chosen exponential decay for the first moment")
+    parser.add_argument('-b2', '--beta_2', type=float, action="store", nargs='?', dest="beta_2"
+                        , help="Chosen exponential decay rate for the second moment")
 
     options = parser.parse_args()
     check_arguments(options)

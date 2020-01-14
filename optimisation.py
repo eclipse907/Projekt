@@ -1,21 +1,19 @@
 from animation import plot
 import numpy as np
 
-precision = 0.01
 
-
-def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta1
-             , beta2, epsilon=1e-8):
+def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision, momentum
+             , beta1, beta2, epsilon=1e-8):
     if algorithm == "SGD":
-        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted)
+        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision)
     elif algorithm == "SGDM":
-        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum)
+        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision, momentum)
     elif algorithm == "ADAM":
-        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta1, beta2
+        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision, beta1, beta2
                     , epsilon)
 
 
-def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted):
+def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision):
     """
 
     :param function: function to be optimised
@@ -23,6 +21,7 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     :param initial_point: point from which the optimisimation is going to start
     :param num_of_iterations: number of iterations after which the optimsiation loop ends if the result is not reached
     :param is_to_be_plotted: boolean marks if the function will be plotted
+    :param precision: the desired value of error
     :return: final point in which function value is the minimum
     """
     domain_point = initial_point
@@ -42,13 +41,14 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     return domain_point
 
 
-def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted=False, momentum=0.05):
+def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision, momentum):
     """
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start
     :param num_of_iterations: number of iterations after which the optimsiation loop ends if the result is not reached
     :param is_to_be_plotted: boolean marks if the function will be plotted
+    :param precision: the desired value of error
     :param momentum: the value which denotes how strongly will momentum influence the iteration result
     :return: final point in which function value is the minimum
     """
@@ -71,13 +71,15 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     return domain_point
 
 
-def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon):
+def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision, beta_1, beta_2
+         , epsilon):
     """
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start
     :param num_of_iterations: number of iterations after which the optimsiation loop ends if the result is not reached
     :param is_to_be_plotted: boolean marks if the function will be plotted
+    :param precision: the desired value of error
     :param beta_1: exponential decay rate for the first moment
     :param beta_2: exponential decay rate for the second moment
     :param epsilon: used as a divisor instead of zero
@@ -96,8 +98,8 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
         second_moment_vector = beta_2 * second_moment_vector + (1 - beta_2) * np.power(gradient, 2)
         computational_first_moment_vector = first_moment_vector / (1 - np.power(beta_1, iterations + 1))
         computational_second_moment_vector = second_moment_vector / (1 - np.power(beta_2, iterations + 1))
-        domain_point = domain_point - learning_rate * computational_first_moment_vector / (np.sqrt(computational_second_moment_vector)
-                                                                     + epsilon)
+        domain_point = domain_point - learning_rate * computational_first_moment_vector \
+                       / (np.sqrt(computational_second_moment_vector) + epsilon)
         domain_point_vector.append(domain_point)
         iterations += 1
 

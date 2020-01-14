@@ -6,6 +6,6 @@
 + 5. popravite warning vezan uz operator is
 6. ilustrirajte funkcionalnost razreda PolynomialFunction primjerima
 + 7. popravite imena (što znači ni?)
-8. zapakirajte algoritme u komponente podesne za integraciju u veći sustav
++ 8. zapakirajte algoritme u komponente podesne za integraciju u veći sustav
    (neka optimizacijski objekt nudi metodu __call__ koja prima gradijente a vraća update, kao što sam opisao u komentaru na githubu)
 9. poopćite za funkcije dvije varijable (samo ako budete imali puno vemena i ako vam se ta ideja posebno svidi)
