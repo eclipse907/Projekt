@@ -4,23 +4,19 @@ import numpy as np
 precision = 0.01
 
 
-# add default parameters
-
-
-def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta_1
-             , beta_2, epsilon):
+def optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta_1, beta_2, precision=0.01, epsilon=1e-8):
     if algorithm == "SGD":
-        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted)
+        return sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision)
     elif algorithm == "SGDM":
-        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum)
+        return sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, precision)
     elif algorithm == "ADAM":
-        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2
-                    , epsilon)
+        return adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon, precision)
 
 
-def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted):
+def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, precision):
     """
 
+    :param precision:
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start
@@ -75,9 +71,10 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     return w
 
 
-def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon):
+def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta_1, beta_2, epsilon, precision):
     """
 
+    :param precision:
     :param function: function to be optimised
     :param learning_rate: the value which denotes how big are the optimisation steps going to be
     :param initial_point: point from which the optimisimation is going to start

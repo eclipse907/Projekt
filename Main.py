@@ -6,27 +6,27 @@ import argparse
 
 
 def check_arguments(options):
-    if options.algorithm.upper() == "SGD":
+    if options.algorithm == "SGD":
         if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
-            options.initial_point = 0
+            options.initial_point = 50
         if options.iterations is None:
             options.iterations = 200
-    elif options.algorithm.upper() == "SGDM":
+    elif options.algorithm == "SGDM":
         if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
-            options.initial_point = 0
+            options.initial_point = 10
         if options.iterations is None:
             options.iterations = 200
         if options.momentum is None:
             options.momentum = 0.9
     elif options.algorithm == "ADAM":
         if options.learning_rate is None:
-            options.learning_rate = 0.001
+            options.learning_rate = 0.1
         if options.initial_point is None:
-            options.initial_point = 0
+            options.initial_point = 10
         if options.iterations is None:
             options.iterations = 200
         if options.beta_1 is None:
@@ -73,11 +73,11 @@ def main():
         options.input_function) + " Choosen algorithm: " + algorithm + " Learning rate: " + str(
         learning_rate) + " Inital point: " + str(initial_point) + " Number of iterations: " + str(num_of_iterations))
     if algorithm == "SGDM":
-        print(" Momentum: " + momentum)
+        print(" Momentum: " + str(momentum))
     if algorithm == "ADAM":
-        print(" Exponential decays for first and second momentum: " + beta_1 + ", " + beta_2)
+        print(" Exponential decays for first and second momentum: " + str(beta_1) + ", " + str(beta_2))
 
-    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations)))
+    print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, True, momentum, beta_1, beta_2)))
 
 
 if __name__ == '__main__':
