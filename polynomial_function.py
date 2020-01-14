@@ -1,4 +1,3 @@
-from builtins import list, str, enumerate
 from builtins import str
 from itertools import zip_longest
 import numpy as np
@@ -25,9 +24,7 @@ class PolynomialFunction:
         function.sort(reverse=True)
 
         powers = []
-        while function:
-            term = function.pop(0)
-
+        for term in function:
             for letter in letters:
                 if letter in term:
                     x, y = term.split(letter)
@@ -36,7 +33,7 @@ class PolynomialFunction:
                     else:
                         self.coefficients.append(1)
                     if y != '':
-                        powers.append(y)
+                        powers.append(y[1::])
                     else:
                         powers.append(1)
                 else:
@@ -85,7 +82,7 @@ class PolynomialFunction:
         result = [t1 - t2 for t1, t2 in zip_longest(c1, c2, fillvalue=0)]
         return PolynomialFunction(result)
 
-    #we've got a bug here
+
     def __gradient__(self):
         fun = np.poly1d(self.coefficients)
         grad_fun = np.polyder(fun)
