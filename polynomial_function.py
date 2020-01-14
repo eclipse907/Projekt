@@ -13,6 +13,9 @@ class PolynomialFunction:
                         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
             self.__parse__(val, self.letters)
 
+    def __call__(self, x):
+        return np.polyval(self.coefficients, x)
+
     def __parse__(self, function, letters):
         signs = ['+', '-', '*']
 
@@ -20,7 +23,6 @@ class PolynomialFunction:
             if element in signs:
                 function = function.replace(element, ' ')
         function = function.split()
-        function.sort(reverse=True)
 
         powers = []
         for term in function:
@@ -28,11 +30,11 @@ class PolynomialFunction:
                 if letter in term:
                     x, y = term.split(letter)
                     if x != '':
-                        self.coefficients.append(x)
+                        self.coefficients.append(int(x))
                     else:
                         self.coefficients.append(1)
                     if y != '':
-                        powers.append(y[1::])
+                        powers.append(int(y[1:]))
                     else:
                         powers.append(1)
                 else:
@@ -50,11 +52,21 @@ class PolynomialFunction:
     def __check_coefficients__(coefficients, powers):
         if len(coefficients) - 1 != powers[0]:
             while len(coefficients) < int(powers[0]) + 1:
-                coefficients.append(0)
+                i = 1
+                while i < len(powers):
+                    if powers[i - 1] - powers[i] > 1:
+                        first_part = coefficients[0:i]
+                        second_part = coefficients[i:]
+                        coefficients = first_part
+                        coefficients.append(0)
+                        coefficients += second_part
+                    i += 1
         return coefficients
 
-    def __call__(self, x):
-        return np.polyval(self.coefficients, x)
+
+
+
+        return coefficients
 
     def __gradient__(self):
         fun = np.poly1d(self.coefficients)
