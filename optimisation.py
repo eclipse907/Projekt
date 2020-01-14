@@ -22,7 +22,7 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     :param num_of_iterations: number of iterations after which the optimsiation loop ends if the result is not reached
     :param is_to_be_plotted: boolean marks if the function will be plotted
     :param precision: the desired value of error
-    :return: final point in which function value is the minimum
+    :return final point in which function value is the minimum
     """
     domain_point = initial_point
     iterations = 0
@@ -50,7 +50,7 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     :param is_to_be_plotted: boolean marks if the function will be plotted
     :param precision: the desired value of error
     :param momentum: the value which denotes how strongly will momentum influence the iteration result
-    :return: final point in which function value is the minimum
+    :return final point in which function value is the minimum
     """
     domain_point = initial_point
     iterations = 0
@@ -82,7 +82,7 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     :param beta1: exponential decay rate for the first moment
     :param beta2: exponential decay rate for the second moment
     :param epsilon: used as a divisor instead of zero
-    :return: final point in which function value is the minimum
+    :return final point in which function value is the minimum
     """
     domain_point = initial_point
     iterations = 0

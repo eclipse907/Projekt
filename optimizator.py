@@ -14,7 +14,7 @@ class Optimizator:
         :param beta1: exponential decay rate for the first moment
         :param beta2: exponential decay rate for the second moment
         :param epsilon: used as a divisor instead of zero
-        :return: final point in which function value is the minimum
+        :return final point in which function value is the minimum
         """
         self.iterations = 0
         self.algorithm = algorithm
