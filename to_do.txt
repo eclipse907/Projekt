@@ -1,7 +1,7 @@
 + 1. broj iteracija vam je prevelik (200 je dosta)
 - 2. popravite bug u uvjetima izlaska iz optimizacijske petlje
 + 3. omogućite da se algoritam i parametri zadaju iz naredbenog retka (koristite argparse)
-4. podesite defaultne parametre optimizacijskih algoritama tako da se vide
++ 4. podesite defaultne parametre optimizacijskih algoritama tako da se vide
    prednosti sgdm-a nad sgd-om te adama nad sgd-om
 + 5. popravite warning vezan uz operator is
 6. ilustrirajte funkcionalnost razreda PolynomialFunction primjerima
