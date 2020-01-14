@@ -5,17 +5,15 @@ import Optimisation as opt
 import argparse
 
 
-# default values of parameters are to be decided, these are just for debugging purposes
-
 def check_arguments(options):
-    if options.algorithm == "SGD":
+    if options.algorithm.upper() == "SGD":
         if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
             options.initial_point = 0
         if options.iterations is None:
             options.iterations = 200
-    elif options.algorithm == "SGDM":
+    elif options.algorithm.upper() == "SGDM":
         if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
@@ -23,7 +21,7 @@ def check_arguments(options):
         if options.iterations is None:
             options.iterations = 200
         if options.momentum is None:
-           options.momentum = 0.9
+            options.momentum = 0.9
     elif options.algorithm == "ADAM":
         if options.learning_rate is None:
             options.learning_rate = 0.001
@@ -38,8 +36,6 @@ def check_arguments(options):
     else:
         raise Exception('Illegal algorithm - choose a valid algorithm [SGD, SGDM, ADAM]')
     return options
-
-
 
 
 def main():
@@ -62,11 +58,10 @@ def main():
     parser.add_argument('-b2', '--beta_2', type=float, action="store", nargs='?', dest="beta_2", help="Chosen exponential decay rate for the second moment")
 
     options = parser.parse_args()
-
     options = check_arguments(options)
 
     function = PolynomialFunction(options.input_function)
-    algorithm = options.algorithm
+    algorithm = options.algorithm.upper()
     learning_rate = options.learning_rate
     initial_point = options.initial_point
     num_of_iterations = options.iterations
@@ -84,13 +79,6 @@ def main():
 
     print(function.__call__(opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations)))
 
-
-"""default values
-
-   function = PolynomialFunction("a^3+a+1")
-   opt.optimise("SGD", function, 0.1, 100, 200)
-   opt.optimise("SGDM", function, 0.005, 1, 1, 0.05)
-"""
 
 if __name__ == '__main__':
     main()
