@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from losses.L2Loss import L2Loss
 from regularizers.L2Regularizer import *
 
-def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
+def logreg_train(X, Y_, lambdaFactor=0, param_niter=100, param_delta=0.1):
     '''
         Argumenti
           X:  podatci, np.array NxD
@@ -25,7 +25,7 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
     #param_delta = 0.3
 
     regularizers = [L2Regularizer(W, lambdaFactor, "l2reg")]
-    loss = L2Loss(Y_, None)
+    loss = L2Loss(Y_, regularizers)
 
     for i in range(param_niter):
         # eksponencirane klasifikacijske mjere
@@ -63,15 +63,16 @@ def logreg_train(X, Y_, lambdaFactor=None, param_niter=100, param_delta=0.1):
         # Yij[range(N), Y_] = 1
         # dL_ds = probs - Yij  # N x C
 
-        dL_ds = loss.backward()
+        grad_W, grad_b = loss.backward_inputs(X)
+
+        # grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
 
         # gradijenti parametara
         # if lambdaFactor is not None:
         #     l2RegGradW = L2.backward_params()[0][1]
-        #     dL_ds += np.transpose(l2RegGradW)
+        #     grad_W += np.transpose(l2RegGradW)
 
-        grad_W = np.dot(np.transpose(dL_ds), X) / N  # C x D
-        grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
+        # grad_b = np.sum(np.transpose(dL_ds), axis=1) / N  # C x 1
 
         # poboljšani parametri
         W += -param_delta * np.transpose(grad_W)

@@ -4,12 +4,13 @@ import numpy as np
 
 class HingeLoss(LossFunction):
 
-    def forward(self, Y):
-        loss_components = np.max(0, np.ones(Y.shape) - np.multiply(self.Y_, Y))
+    def forward(self, scores):
+        loss_components = np.max(0, np.ones(scores.shape) - np.multiply(self.Y_, scores))
         regularized_loss = np.sum(loss_components)
-        if self.regularizer:
-            regularized_loss += sum((reg.forward() for reg in self.regularizer))
+        if self.regularizers:
+            for reg in self.regularizers:
+                regularized_loss += reg.forward()
         return [loss_components, regularized_loss]
 
-    def backward(self):
+    def backward_inputs(self, previous_input):
         pass

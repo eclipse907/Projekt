@@ -4,20 +4,24 @@ import numpy as np
 
 class LossFunction(ABC):
 
-    def __init__(self, Y_, regularizer):
+    def __init__(self, Y_, regularizers):
         """
         :param Y_: array tocnih klasa, N x 1
-        :param regularizer: lista regularizatora
+        :param regularizers: lista regularizatora
         """
         self.Y_ = Y_
-        self.regularizer = regularizer
+        self.regularizers = regularizers
 
     @abstractmethod
-    def forward(self, Y):
+    def forward(self, scores):
         pass
 
     @abstractmethod
-    def backward(self):
+    def backward_inputs(self, previous_input):
+        pass
+
+    @abstractmethod
+    def backward_params(self):
         pass
 
     def stable_softmax(self, x):

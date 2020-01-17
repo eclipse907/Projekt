@@ -79,7 +79,7 @@ if __name__ == '__main__':
         print(np.intersect1d(Xtrain, Xtest))
 
         # train the model
-        W, b = logreg_train(Xtrain, Y_train, np.exp(-1), 10000, 0.1)
+        W, b = logreg_train(Xtrain, Y_train, np.exp(-1), 5000, 0.1)
         #W, b = logreg_train(X, Y_, LAMBDA_FACTOR)
 
         # # evaluate the model on the train dataset

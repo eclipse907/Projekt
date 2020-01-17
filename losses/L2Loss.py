@@ -4,18 +4,27 @@ import numpy as np
 
 class L2Loss(LossFunction):
 
-    def forward(self, logits):
-        self.logits = logits
-        self.Y_oh = np.zeros(logits.shape)
-        self.Y_oh[range(logits.shape[0]), self.Y_] = 1
-        self.probs = self.stable_softmax(logits)
+    def forward(self, scores):
+        self.logits = scores
+        self.Y_oh = np.zeros(scores.shape)
+        N = scores.shape[0]
+        self.Y_oh[range(N), self.Y_] = 1
+        self.probs = self.stable_softmax(scores)
         regularized_loss = 0.5 * np.sum(np.square(self.probs - self.Y_oh))
-        if self.regularizer:
-            regularized_loss += sum((reg.forward() for reg in self.regularizer))
+        if self.regularizers:
+            for reg in self.regularizers:
+                regularized_loss += reg.forward()
         return regularized_loss
 
-    def backward(self):
-        dL_ds = self.probs - self.Y_oh
-        if self.regularizer:
-            dL_ds += self.regularizer.backward_params()[0][1]
-        return dL_ds
+    def backward_inputs(self, previous_input):
+        dL_ds = self.probs - self.Y_oh  # N x C
+        gradW = np.dot(dL_ds.T, previous_input)
+        gradb = np.sum(dL_ds.T, axis=1)
+        return [gradW, gradb]
+
+    def backward_params(self):
+        grads = []
+        if self.regularizers:
+            for reg in self.regularizers:
+                grads += [reg.backward_params()]
+        return grads
