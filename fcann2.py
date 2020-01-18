@@ -51,10 +51,10 @@ class Params:
         self.delta = delta
 
 
-def train(model, params):
+def train(model, params, loss):
     for i in range(params.niter):
         probs = model.forward_pass()
-        loss_func(model, probs, i)
+        loss.loss_func(model, probs, i)
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(probs)
         model.W1 += -params.delta * np.transpose(grad_W1)
         model.b1 += -params.delta * grad_b1
@@ -64,24 +64,34 @@ def train(model, params):
 
 def fcann2_decfun(model):
     def classify(X):
-        probs = model.forward_pass()
+        N = X.shape[0]
+        scores1 = np.dot(X, model.W1) + model.b1  # N x 5
+        hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
+        scores2 = np.dot(hiddenLayer1, model.W2) + model.b2  # N x C
+        maxScores2 = np.amax(scores2, axis=1)  # 1 x N
+        expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
+        sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
+        probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
         return probs[:, 0]
     return classify
 
+class Loss:
 
-def loss_func(model, probs, i):
-    logprobs = np.log(probs[range(model.N), model.Y_])  # N x 1
-    loss = -(np.sum(logprobs) / model.N)  # skalar
-    if i % 10 == 0:
-        print("iteration {}: loss {}".format(i, loss))
+    def loss_func(self, model, probs, i):
+        logprobs = np.log(probs[range(model.N), model.Y_])  # N x 1
+        loss = -(np.sum(logprobs) / model.N)  # skalar
+        if i % 10 == 0:
+            print("iteration {}: loss {}".format(i, loss))
+        return loss
 
 
 if __name__ == "__main__":
     np.random.seed(100)
-    model = Model(100, 2, 2)
-    params = Params(50000, 0.17)
-    model.random_dataset(5, 2, 20)
-    train(model, params)
+    model = Model(500, 2, 2)
+    params = Params(50000, 0.26)
+    loss = Loss()
+    model.random_dataset(5, 2, 100)
+    train(model, params, loss)
     probs = model.forward_pass()
     Y = np.argwhere(np.around(probs))[:, 1]
     decfun = fcann2_decfun(model)
