@@ -12,7 +12,7 @@ arguments in command line.
 CHOOSING OPTIMISING ALGORITHM, FUNCTION TO OPTIMISE AND PARAMETERS
 
 Optimising algorithm and the function are the only parameters needed for this program to work. Other parameters will
-be set to their default values.
+be set to their default values if not added.
     Example:
         python main.py -algo SGD -ip x^2-2x+1
     

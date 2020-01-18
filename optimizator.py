@@ -4,8 +4,9 @@ import numpy as np
 class Optimizator:
 
     def __init__(self, algorithm, function, learning_rate, initial_point, num_of_iterations, momentum, beta1, beta2,
-                 epsilon=1e-8, precision=0.01):
+                 epsilon=1e-8):
         """
+        :param algorithm: strings "SGD", "SGDM" and "ADAM" dentoe which algorithm is going to be used
         :param function: function to be optimised
         :param learning_rate: the value which denotes how big are the optimisation steps going to be
         :param initial_point: point from which the optimisimation is going to start
@@ -26,7 +27,6 @@ class Optimizator:
         self.beta_1 = beta1
         self.beta_2 = beta2
         self.epsilon = epsilon
-        self.precision = precision
         self.domain_point = initial_point
         self.domain_point_derivative = 0
         self.first_moment_vector = 0
@@ -58,6 +58,6 @@ class Optimizator:
         computational_first_moment_vector = self.first_moment_vector / (1 - np.power(self.beta_1, self.iterations + 1))
         computational_second_moment_vector = \
             self.second_moment_vector / (1 - np.power(self.beta_2, self.iterations + 1))
-        domain_point = self.domain_point - self.learning_rate * computational_first_moment_vector / \
+        self.domain_point = self.domain_point - self.learning_rate * computational_first_moment_vector / \
                        (np.sqrt(computational_second_moment_vector) + self.epsilon)
         return self.function(self.domain_point)

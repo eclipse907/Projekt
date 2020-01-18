@@ -10,7 +10,7 @@ def check_arguments(options):
         if options.learning_rate is None:
             options.learning_rate = 0.01
         if options.initial_point is None:
-            options.initial_point = 50
+            options.initial_point = 0
         if options.iterations is None:
             options.iterations = 200
     elif str(options.algorithm).upper() == "SGDM":
@@ -26,7 +26,7 @@ def check_arguments(options):
         if options.learning_rate is None:
             options.learning_rate = 0.1
         if options.initial_point is None:
-            options.initial_point = 10
+            options.initial_point = 0
         if options.iterations is None:
             options.iterations = 200
         if options.beta1 is None:
