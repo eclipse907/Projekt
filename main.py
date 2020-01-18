@@ -8,23 +8,23 @@ import argparse
 def check_arguments(options):
     if str(options.algorithm).upper() == "SGD":
         if options.learning_rate is None:
-            options.learning_rate = 0.01
+            options.learning_rate = 0.1
         if options.initial_point is None:
-            options.initial_point = 0
+            options.initial_point = -2
         if options.iterations is None:
             options.iterations = 200
     elif str(options.algorithm).upper() == "SGDM":
         if options.learning_rate is None:
-            options.learning_rate = 0.01
+            options.learning_rate = 0.1
         if options.initial_point is None:
             options.initial_point = 0
         if options.iterations is None:
             options.iterations = 200
         if options.momentum is None:
-            options.momentum = 0.9
+            options.momentum = 0.01
     elif str(options.algorithm).upper() == "ADAM":
         if options.learning_rate is None:
-            options.learning_rate = 0.1
+            options.learning_rate = 0.5
         if options.initial_point is None:
             options.initial_point = 0
         if options.iterations is None:
@@ -78,7 +78,7 @@ def main():
     is_to_be_plotted = True
 
     print("Given function: " + str(
-        options.input_function) + " Choosen algorithm: " + algorithm + " Learning rate: " + str(
+    options.input_function) + " Choosen algorithm: " + algorithm + " Learning rate: " + str(
         learning_rate) + " Inital point: " + str(initial_point) + " Number of iterations: " + str(num_of_iterations))
     if algorithm == "SGDM":
         print(" Momentum: " + str(momentum))

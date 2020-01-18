@@ -2,16 +2,17 @@ from builtins import str
 import sympy as sym
 
 
-
 class OnevariableFunction:
 
     string_function = ""
 
     replacements = {
         '^': '**'
+
     }
 
     def __init__(self, value):
+        self.string_function = value.replace(" ", "")
         for old, new in self.replacements.items():
             self.string_function = value.replace(old, new)
 

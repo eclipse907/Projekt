@@ -4,16 +4,18 @@ import sympy as sym
 from onevariable_function import OnevariableFunction
 
 
+def __function_wrapper(x, function):
+    return [function(element) for element in x]
+
+
 def plot(function, values, min_x, max_x):
     x = np.linspace(min_x, max_x, 10000, endpoint=True)
-    function_values = []
+    y = __function_wrapper(x, function.__call__)
 
-    for element in x:
-        function_values.append(function.__call__(element))
     i = 1
     for w in values:
         plt.clf()
-        plt.plot(x, function_values)
+        plt.plot(x, y)
         plt.plot(w, function.__call__(w), 'ro')
         plt.draw()
         print("Iteration no. " + str(i) + "... Value of the function: " + str(function.__call__(w)))
