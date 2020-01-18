@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import data
-
+from importlib import import_module
 
 class Model:
 
@@ -44,13 +44,6 @@ class Model:
         return grad_W1, grad_b1, grad_W2, grad_b2
 
 
-class Params:
-
-    def __init__(self, niter, delta):
-        self.niter = niter
-        self.delta = delta
-
-
 def train(model, params, loss):
     for i in range(params.niter):
         probs = model.forward_pass()
@@ -75,23 +68,18 @@ def fcann2_decfun(model):
         return probs[:, 0]
     return classify
 
-class Loss:
-
-    def loss_func(self, model, probs, i):
-        logprobs = np.log(probs[range(model.N), model.Y_])  # N x 1
-        loss = -(np.sum(logprobs) / model.N)  # skalar
-        if i % 10 == 0:
-            print("iteration {}: loss {}".format(i, loss))
-        return loss
-
 
 if __name__ == "__main__":
     np.random.seed(100)
-    model = Model(500, 2, 2)
-    params = Params(50000, 0.26)
-    loss = Loss()
-    model.random_dataset(5, 2, 100)
-    train(model, params, loss)
+    N = int(input("Unesite broj podataka:"))
+    C = int(input("Unesite broj razreda:"))
+    model = Model(N, 2, C)
+    model.random_dataset(5, 2, int(N / 5))
+    name = input("Unesite ime modula s parametrima:")
+    paramsModule = import_module(name)
+    name = input("Unesite ime modula sa funkcijom gubitka:")
+    lossModule = import_module(name)
+    train(model, paramsModule, lossModule)
     probs = model.forward_pass()
     Y = np.argwhere(np.around(probs))[:, 1]
     decfun = fcann2_decfun(model)
