@@ -1,9 +1,11 @@
-from polynomial_function import PolynomialFunction
+from onevariable_function import OnevariableFunction
 import main
 import optimisation as opt
 
+
+"OBAVEZNO POPRAVITI OVA OBJASNJENJA"
 """
-This module's role is to present proper usage of PolynomialFunction class and valid input of 
+This module's role is to present proper usage of OnevariableFunction class and valid input of 
 arguments in command line.
 
 
@@ -39,18 +41,19 @@ Function MUST be passed in the previously mentioned format, but spaces are also 
 
 """
 
-# Uncomment this for a preview of the optimisation using PolynomialFunction class:
+# Uncomment this for a preview of the optimisation using OnevariableFunction class:
 
-"""
-algorithm = "SGD"
-function = PolynomialFunction("x^2-2x+1")
-learning_rate = 0.01
-initial_point = 10
+value = "sin(1/x)"
+
+opt_function = OnevariableFunction(value)
+
+algorithm = "SGDM"
+
+learning_rate = 0.1
+initial_point = 1
 num_of_iterations = 200
 is_to_be_plotted = True
 momentum = 0.9
 
-
-opt.optimise(algorithm, function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta1=0, beta2=0)
-
-"""
+opt.optimise(algorithm, opt_function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta1=0,
+             beta2=0)

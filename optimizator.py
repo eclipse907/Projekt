@@ -28,7 +28,7 @@ class Optimizator:
         self.epsilon = epsilon
         self.precision = precision
         self.domain_point = initial_point
-        self.domain_point_derivateive = 0
+        self.domain_point_derivative = 0
         self.first_moment_vector = 0
         self.second_moment_vector = 0
 
@@ -42,17 +42,17 @@ class Optimizator:
             return self.__adam()
 
     def __sgd(self):
-        self.domain_point = self.domain_point - self.learning_rate * self.function.__gradient__()(self.domain_point)
+        self.domain_point = self.domain_point - self.learning_rate * self.function.__gradient__(self.domain_point)
         return self.function(self.domain_point)
 
     def __sgdm(self):
-        gradient = self.function.__gradient__()(self.domain_point)
+        gradient = self.function.__gradient__(self.domain_point)
         self.domain_point_derivative = self.momentum * self.domain_point_derivative - self.learning_rate * gradient
         self.domain_point = self.domain_point + self.domain_point_derivative
         return self.function(self.domain_point)
 
     def __adam(self):
-        gradient = self.function.__gradient__()(self.domain_point)
+        gradient = self.function.__gradient__(self.domain_point)
         self.first_moment_vector = self.beta_1 * self.first_moment_vector + (1 - self.beta_1) * gradient
         self.second_moment_vector = self.beta_2 * self.second_moment_vector + (1 - self.beta_2) * np.power(gradient, 2)
         computational_first_moment_vector = self.first_moment_vector / (1 - np.power(self.beta_1, self.iterations + 1))

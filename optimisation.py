@@ -1,4 +1,5 @@
 from animation import plot
+import sympy as sym
 import numpy as np
 
 
@@ -27,10 +28,10 @@ def sgd(function, learning_rate, initial_point, num_of_iterations, is_to_be_plot
     domain_point = initial_point
     iterations = 0
     domain_point_vector = []
-    gradient = function.__gradient__()(domain_point)
+    gradient = function.__gradient__(domain_point)
 
     while abs(gradient) >= precision or iterations < num_of_iterations:
-        gradient = function.__gradient__()(domain_point)
+        gradient = function.__gradient__(domain_point)
         domain_point = domain_point - learning_rate * gradient
         domain_point_vector.append(domain_point)
         iterations += 1
@@ -56,10 +57,10 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     iterations = 0
     domain_point_derivative = 0
     domain_point_vector = []
-    gradient = function.__gradient__()(domain_point)
+    gradient = function.__gradient__(domain_point)
 
     while abs(gradient) >= precision or iterations < num_of_iterations:
-        gradient = function.__gradient__()(domain_point)
+        gradient = function.__gradient__(domain_point)
         domain_point_derivative = momentum * domain_point_derivative - learning_rate * gradient
         domain_point = domain_point + domain_point_derivative
         domain_point_vector.append(domain_point)
@@ -87,12 +88,12 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
     domain_point = initial_point
     iterations = 0
     domain_point_vector = []
-    gradient = function.__gradient__()(domain_point)
+    gradient = function.__gradient__(domain_point)
     first_moment_vector = 0
     second_moment_vector = 0
 
     while abs(gradient) >= precision or iterations < num_of_iterations:
-        gradient = function.__gradient__()(domain_point)
+        gradient = function.__gradient__(domain_point)
         first_moment_vector = beta1 * first_moment_vector + (1 - beta1) * gradient
         second_moment_vector = beta2 * second_moment_vector + (1 - beta2) * np.power(gradient, 2)
         computational_first_moment_vector = first_moment_vector / (1 - np.power(beta1, iterations + 1))

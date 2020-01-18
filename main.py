@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from polynomial_function import PolynomialFunction
+from onevariable_function import OnevariableFunction
 import optimisation as opt
 import argparse
 
@@ -65,14 +65,15 @@ def main():
     options = parser.parse_args()
     check_arguments(options)
 
-    function = PolynomialFunction(options.input_function)
+    function = OnevariableFunction(options.input_function)
     algorithm = options.algorithm.upper()
     learning_rate = options.learning_rate
     initial_point = options.initial_point
     num_of_iterations = options.iterations
     momentum = options.momentum
-    beta1 = options.beta_1
-    beta2 = options.beta_2
+    beta1 = options.beta1
+    beta2 = options.beta2
+
 
     is_to_be_plotted = True
 
