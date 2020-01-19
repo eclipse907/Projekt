@@ -19,7 +19,7 @@ class Model:
 
     def init_dataset(self, X, Y_):
         self.X = X
-        self.Y = Y
+        self.Y_ = Y_
 
     def forward_pass(self):
         self.scores1 = np.dot(self.X, self.W1) + self.b1  # N x 5
@@ -44,10 +44,12 @@ class Model:
         return grad_W1, grad_b1, grad_W2, grad_b2
 
 
-def train(model, params, loss):
+def train(model, params, loss, regularizer, optimization):
     for i in range(params.niter):
         probs = model.forward_pass()
-        loss.loss_func(model, probs, i)
+        loss = loss.loss_func(model, probs, regularizer)
+        if i % 10 == 0:
+            print("iteration {}: loss {}".format(i, loss))
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(probs)
         model.W1 += -params.delta * np.transpose(grad_W1)
         model.b1 += -params.delta * grad_b1
@@ -71,15 +73,19 @@ def fcann2_decfun(model):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    N = int(input("Unesite broj podataka:"))
-    C = int(input("Unesite broj razreda:"))
+    N = int(input("Unesite broj podataka: "))
+    C = int(input("Unesite broj razreda: "))
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
-    name = input("Unesite ime modula s parametrima:")
+    name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module(name)
-    name = input("Unesite ime modula sa funkcijom gubitka:")
+    name = input("Unesite ime modula sa funkcijom gubitka: ")
     lossModule = import_module(name)
-    train(model, paramsModule, lossModule)
+    name = input("Unesite ime modula sa regularizacijom: ")
+    regularizerModule = import_module(name)
+    name = input("Unesite ime modula sa optimizacijom: ")
+    optimizationModule = import_module(name)
+    train(model, paramsModule, lossModule, regularizerModule, optimizationModule)
     probs = model.forward_pass()
     Y = np.argwhere(np.around(probs))[:, 1]
     decfun = fcann2_decfun(model)
