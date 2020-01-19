@@ -14,7 +14,7 @@ def earlyStopping(X_train, Y_train, n, p, subtrain_valid_split_factor = 0.7):
 
 
     # set theta to random values again - TODO: check
-    W1, b1, W2, b2 = fcann2_setup_initial_params(X_train, Y_train)
+    fcann2_setup_initial_params(X_train, Y_train)
 
     W1, b1, W2, b2 = fcann2_train(X_train, Y_train, opt_niter)
 
