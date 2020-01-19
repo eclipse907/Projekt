@@ -12,9 +12,11 @@ def earlyStopping(X_train, Y_train, n, p, subtrain_valid_split_factor = 0.7):
     # find optimal params by early stopping
     opt_params, opt_niter, opt_error = findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p)
 
-    # set theta to random values again - TODO: This is unneccesary because W1, b1, W2, b2 are int values, not references?
 
-    W1, b1, W2, b2 = fcann2_train(inSet[1], outSet[1], opt_niter)
+    # set theta to random values again - TODO: check
+    W1, b1, W2, b2 = fcann2_setup_initial_params(X_train, Y_train)
+
+    W1, b1, W2, b2 = fcann2_train(X_train, Y_train, opt_niter)
 
     return (W1, b1, W2, b2), opt_niter
 
