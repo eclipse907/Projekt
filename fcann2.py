@@ -4,8 +4,27 @@ import data
 from losses.L2Loss import L2Loss
 from regularizers.L2Regularizer import L2Regularizer
 
+W1_initial, b1_initial, W2_initial, b2_initial = 0, 0, 0, 0
 
-def fcann2_train(X, Y_):
+def fcann2_setup_initial_params(X, Y_):
+    D = X.shape[1]
+    C = max(Y_) + 1
+
+    global W1_initial
+    W1_initial = np.random.randn(D, 5)
+    global b1_initial
+    b1_initial = np.random.randn(1, 5)
+    global W2_initial
+    W2_initial = np.random.randn(5, C)
+    global b2_initial
+    b2_initial = np.random.randn(1, C)
+
+    return W1_initial, b1_initial, W2_initial, b2_initial
+
+
+
+
+def fcann2_train(X, Y_, param_niter = 100000):
     """
     Argumenti
       X: ulazni podaci, dimenzije NxD
@@ -14,11 +33,12 @@ def fcann2_train(X, Y_):
     N = X.shape[0]
     D = X.shape[1]
     C = max(Y_) + 1
-    W1 = np.random.randn(D, 5)
-    b1 = np.random.randn(1, 5)
-    W2 = np.random.randn(5, C)
-    b2 = np.random.randn(1, C)
-    param_niter = 100000
+
+    W1 = W1_initial
+    b1 = b1_initial
+    W2 = W2_initial
+    b2 = b2_initial
+
     param_delta = 0.05
     param_lambda = 0
     regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
