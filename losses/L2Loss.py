@@ -7,8 +7,7 @@ class L2Loss(LossFunction):
     def forward(self, scores):
         self.logits = scores
         self.Y_oh = np.zeros(scores.shape)
-        N = scores.shape[0]
-        self.Y_oh[range(N), self.Y_] = 1
+        self.Y_oh[range(scores.shape[0]), self.Y_] = 1
         self.probs = self.stable_softmax(scores)
         regularized_loss = 0.5 * np.sum(np.square(self.probs - self.Y_oh))
         if self.regularizers:
