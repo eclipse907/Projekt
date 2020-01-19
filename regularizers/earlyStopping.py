@@ -52,7 +52,10 @@ def findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p):
         i = i + n
 
         #TODO
-        v_prime = ValidationSetError(X_valid, Y_valid)
+        Y = fcann2_classify(X_valid, W1, b1, W2, b2)
+        accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
+        v_prime = 1 - accuracy
+
         if v_prime < v:
             j = 0
             W1_star, b1_star, W2_star, b2_star = W1, b1, W2, b2
