@@ -12,8 +12,7 @@ def earlyStopping(X_train, Y_train, n, p, subtrain_valid_split_factor = 0.7):
     # find optimal params by early stopping
     opt_params, opt_niter, opt_error = findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p)
 
-
-    # set theta to random values again - TODO: not needed because W1, b1, W2, b2 are saved (line 11)?
+    # set theta to random values again - not needed because W1, b1, W2, b2 are saved (line 11)
 
     W1, b1, W2, b2 = fcann2_train(X_train, Y_train, opt_niter)
 
@@ -51,7 +50,6 @@ def findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p):
 
         i = i + n
 
-        #TODO
         Y = fcann2_classify(X_valid, W1, b1, W2, b2)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
         v_prime = 1 - accuracy
