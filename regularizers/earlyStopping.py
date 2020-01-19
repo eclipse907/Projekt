@@ -2,8 +2,8 @@ import numpy as np
 from fcann2 import *
 
 # Algorithm 7.2
-def earlyStopping(X_train, Y_train, n, p, subtrain_valid_split_factor = 0.7):
-    inOutSets = prepareXYSubtrainAndValidSets(X_train, Y_train, subtrain_valid_split_factor)    # return: inOutSets = (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+def earlyStopping(X_train, Y_train, n, p, valid_set_factor=0.3):
+    inOutSets = prepareXYSubtrainAndValidSets(X_train, Y_train, valid_set_factor)    # return: inOutSets = (X_valid, X_subtrain), (Y_valid, Y_subtrain)
     inSet = inOutSets[0]
     outSet = inOutSets[1]
 
@@ -25,15 +25,15 @@ def earlyStopping(X_train, Y_train, n, p, subtrain_valid_split_factor = 0.7):
 
 
 
-def prepareXYSubtrainAndValidSets(X_train, Y_train, subtrain_valid_split_factor):
+def prepareXYSubtrainAndValidSets(X_train, Y_train, valid_set_factor=0.3):
     n_samples = X_train.shape[0]
 
-    mask = np.ones((int(n_samples * (1 - subtrain_valid_split_factor)),), dtype=bool)
-    mask = np.hstack((mask, np.zeros((int(n_samples * subtrain_valid_split_factor),), dtype=bool)))
+    mask = np.ones((int(n_samples * valid_set_factor),), dtype=bool)
+    mask = np.hstack((mask, np.zeros((int(n_samples * (1 - valid_set_factor)),), dtype=bool)))
     np.random.shuffle(mask)
 
-    X_valid, X_subtrain = X_train[mask, :], X_train[mask]
-    Y_valid, Y_subtrain = Y_train[np.logical_not(mask), :], Y_train[np.logical_not(mask)]
+    X_valid, Y_valid = X_train[mask, :], Y_train[mask]
+    X_subtrain, Y_subtrain = X_train[np.logical_not(mask), :], Y_train[np.logical_not(mask)]
 
     return (X_valid, X_subtrain), (Y_valid, Y_subtrain)
 
