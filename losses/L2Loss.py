@@ -16,15 +16,9 @@ class L2Loss(LossFunction):
                 regularized_loss += reg.forward()
         return regularized_loss
 
-    def backward_inputs(self, previous_input):
+    def backward_inputs(self, scores):
         dL_ds = self.probs - self.Y_oh  # N x C
-        gradW = np.dot(dL_ds.T, previous_input)
+        gradW = np.dot(dL_ds.T, scores)
         gradb = np.sum(dL_ds.T, axis=1)
-        return [gradW, gradb]
-
-    def backward_params(self):
-        grads = []
-        if self.regularizers:
-            for reg in self.regularizers:
-                grads += [reg.backward_params()]
-        return grads
+        # return [gradW, gradb]
+        return dL_ds

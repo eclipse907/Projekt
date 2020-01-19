@@ -17,12 +17,15 @@ class LossFunction(ABC):
         pass
 
     @abstractmethod
-    def backward_inputs(self, previous_input):
+    def backward_inputs(self, scores):
         pass
 
-    @abstractmethod
     def backward_params(self):
-        pass
+        grads = []
+        if self.regularizers:
+            for reg in self.regularizers:
+                grads += [reg.backward_params()]
+        return grads
 
     def stable_softmax(self, x):
         N = x.shape[0]

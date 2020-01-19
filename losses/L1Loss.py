@@ -13,10 +13,8 @@ class L1Loss(LossFunction):
         if self.regularizers:
             for reg in self.regularizers:
                 regularized_loss += reg.forward()
-        return [loss_components, regularized_loss]
+        return regularized_loss
 
-    def backward_inputs(self, previous_input):
+    def backward_inputs(self, scores):
         grad = np.sign(self.scores - self.Y_oh)
-        if self.regularizers:
-            grad += sum((reg.backward_params()[0][1] for reg in self.regularizers))
         return grad

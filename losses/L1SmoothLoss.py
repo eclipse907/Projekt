@@ -20,19 +20,16 @@ class L1SmoothLoss(LossFunction):
         if self.regularizers:
             for reg in self.regularizers:
                 regularized_loss += reg.forward()
-        return [lossAllWeights, regularized_loss]
+        return regularized_loss
 
-    def backward_inputs(self, previous_input):
+    def backward_inputs(self, scores):
         """
         Returns:
           Gradient of the smooth L1 loss with respect to the weights.
-          :param previous_input:
+          :param scores:
         """
 
         gradAllWeights = np.where(np.abs(self.scores - self.Y_oh) < 1,
                                   self.scores - self.Y_oh,
                                   np.sign(self.scores - self.Y_oh))
-        # print(gradAllWeights)
-        if self.regularizers:
-            gradAllWeights += sum((reg.backward_params()[0][1] for reg in self.regularizers))
         return gradAllWeights
