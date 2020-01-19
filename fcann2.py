@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import data
 from losses.HingeLoss import HingeLoss
+from losses.L1Loss import L1Loss
+from losses.L1SmoothLoss import L1SmoothLoss
 from losses.L2Loss import L2Loss
 from regularizers.L2Regularizer import L2Regularizer
 
@@ -25,7 +27,7 @@ def fcann2_setup_initial_params(X, Y_):
 
 
 
-def fcann2_train(X, Y_, param_niter = 100000):
+def fcann2_train(X, Y_, param_niter = 10000):
     """
     Argumenti
       X: ulazni podaci, dimenzije NxD
@@ -44,7 +46,7 @@ def fcann2_train(X, Y_, param_niter = 100000):
     param_delta = 0.05
     param_lambda = np.exp(-3)
     regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
-    loss = HingeLoss(Y_, regularizers)
+    loss = L2Loss(Y_, regularizers)
     for i in range(param_niter):
         scores1 = np.dot(X, W1) + b1  # N x 5
         hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
@@ -105,7 +107,7 @@ if __name__ == "__main__":
     fcann2_setup_initial_params(X, Y_)
     W1, b1, W2, b2 = fcann2_train(X, Y_)
     probs = fcann2_classify(X, W1, b1, W2, b2)
-    Y = np.argwhere(np.around(probs))[:, 1]
+    Y = np.argmax(probs, axis=1)
 
     acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_)
 
