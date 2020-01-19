@@ -26,7 +26,7 @@ def earlyStopping(X_train, Y_train, n, p, subtrain_valid_split_factor = 0.7):
 
 
 def prepareXYSubtrainAndValidSets(X_train, Y_train, subtrain_valid_split_factor):
-    n_samples = np.shape(X_train)[0] * np.shape(X_train)[1]
+    n_samples = X_train.shape[0]
 
     mask = np.ones((int(n_samples * (1 - subtrain_valid_split_factor)),), dtype=bool)
     mask = np.hstack((mask, np.zeros((int(n_samples * subtrain_valid_split_factor),), dtype=bool)))
