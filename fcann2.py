@@ -44,13 +44,17 @@ class Model:
         return grad_W1, grad_b1, grad_W2, grad_b2
 
 
-def train(model, params, loss, regularizer, optimization):
+def train(model, params, loss, regularizer, optimization, gradCheck):
     for i in range(params.niter):
         probs = model.forward_pass()
         loss = loss.loss_func(model, probs, regularizer)
+        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(probs)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
-        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(probs)
+            print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
         model.W1 += -params.delta * np.transpose(grad_W1)
         model.b1 += -params.delta * grad_b1
         model.W2 += -params.delta * np.transpose(grad_W2)
@@ -85,7 +89,9 @@ if __name__ == "__main__":
     regularizerModule = import_module(name)
     name = input("Unesite ime modula sa optimizacijom: ")
     optimizationModule = import_module(name)
-    train(model, paramsModule, lossModule, regularizerModule, optimizationModule)
+    name = input("Unesite ime modula sa provjerom gradijenta: ")
+    gradCheckModule = import_module(name)
+    train(model, paramsModule, lossModule, regularizerModule, optimizationModule, gradCheckModule)
     probs = model.forward_pass()
     Y = np.argwhere(np.around(probs))[:, 1]
     decfun = fcann2_decfun(model)
