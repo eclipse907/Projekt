@@ -24,5 +24,5 @@ class HingeLoss(LossFunction):
         dL_ds = np.zeros(scores.shape)
         class_losses = self.margin + scores - self.true_class_scores
         dL_ds[self.Y_oh == 1] = - np.where(self.Y_oh == 1, 0, class_losses > 0).sum(axis=1)
-        dL_ds[self.Y_oh != 1] = np.where(self.Y_oh != 1, class_losses > 0, 0)
+        dL_ds += np.where(self.Y_oh != 1, class_losses > 0, 0)
         return dL_ds

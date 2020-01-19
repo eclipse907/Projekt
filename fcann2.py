@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import data
+from losses.HingeLoss import HingeLoss
 from losses.L2Loss import L2Loss
 from regularizers.L2Regularizer import L2Regularizer
 
@@ -30,6 +31,7 @@ def fcann2_train(X, Y_, param_niter = 100000):
       X: ulazni podaci, dimenzije NxD
       Y_: točni indeksi, dimenzije Nx1
     """
+    global W1_initial, b1_initial, W2_initial, b2_initial
     N = X.shape[0]
     D = X.shape[1]
     C = max(Y_) + 1
@@ -40,9 +42,9 @@ def fcann2_train(X, Y_, param_niter = 100000):
     b2 = b2_initial
 
     param_delta = 0.05
-    param_lambda = 0
+    param_lambda = np.exp(-3)
     regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
-    loss = L2Loss(Y_, [regularizers])
+    loss = HingeLoss(Y_, regularizers)
     for i in range(param_niter):
         scores1 = np.dot(X, W1) + b1  # N x 5
         hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
@@ -53,11 +55,13 @@ def fcann2_train(X, Y_, param_niter = 100000):
         # probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
         # logprobs = np.log(probs[range(N), Y_])  # N x 1
         # loss = -(np.sum(logprobs) / N)  # skalar
+
+        loss_sum = loss.forward(scores2)
+
         if i % 10 == 0:
-            print("iteration {}: loss {}".format(i, loss))
-        Yij = np.zeros((N, C))
-        Yij[range(N), Y_] = 1
-        Gs2 = probs - Yij  # N x C
+            print("iteration {}: loss {}".format(i, loss_sum))
+
+        Gs2 = loss.backward_inputs(scores2)
         grad_W2 = np.dot(np.transpose(Gs2), hiddenLayer1)  # C x 5
         grad_b2 = np.sum(np.transpose(Gs2), axis=1)  # C x 1
         Gh1 = np.transpose(np.dot(W2, np.transpose(Gs2)))  # N x 5
@@ -65,10 +69,13 @@ def fcann2_train(X, Y_, param_niter = 100000):
         Gs1[Gs1 < 0] = 0
         grad_W1 = np.dot(np.transpose(Gs1), X)  # 5 x D
         grad_b1 = np.sum(np.transpose(Gs1), axis=1)  # 5 x 1
+
         W1 += -param_delta * np.transpose(grad_W1)
         b1 += -param_delta * grad_b1
         W2 += -param_delta * np.transpose(grad_W2)
         b2 += -param_delta * grad_b2
+        for grad in loss.backward_params():
+            grad[0][0] += -param_delta * grad[0][1]
     return W1, b1, W2, b2
 
 
@@ -95,9 +102,13 @@ def fcann2_decfun(W1, b1, W2, b2):
 if __name__ == "__main__":
     np.random.seed(100)
     X, Y_ = data.sample_gmm_2d(6, 2, 10)
+    fcann2_setup_initial_params(X, Y_)
     W1, b1, W2, b2 = fcann2_train(X, Y_)
     probs = fcann2_classify(X, W1, b1, W2, b2)
     Y = np.argwhere(np.around(probs))[:, 1]
+
+    acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_)
+
     decfun = fcann2_decfun(W1, b1, W2, b2)
     rect = (np.min(X, axis=0), np.max(X, axis=0))
     data.graph_surface(decfun, rect, offset=0)
