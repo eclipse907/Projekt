@@ -53,7 +53,8 @@ def findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p):
 
         i = i + n
 
-        Y = fcann2_classify(X_valid, W1, b1, W2, b2)
+        probs = fcann2_classify(X_valid, W1, b1, W2, b2)
+        Y = np.argmax(probs, axis=1)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
         v_prime = 1 - accuracy
 
