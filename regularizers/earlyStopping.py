@@ -45,7 +45,7 @@ def findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p):
     i = 0
     j = 0
     v = np.inf
-    W1_star, b1_star, W2_star, b2_star = W1, b1, W2, b2
+    W1_star, b1_star, W2_star, b2_star = W1.copy(), b1.copy(), W2.copy(), b2.copy()
     i_star = i
 
     while j < p:
@@ -59,7 +59,7 @@ def findOptimalParams(W1, b1, W2, b2, inSet, outSet, n, p):
 
         if v_prime < v:
             j = 0
-            W1_star, b1_star, W2_star, b2_star = W1, b1, W2, b2
+            W1_star, b1_star, W2_star, b2_star = W1.copy(), b1.copy(), W2.copy(), b2.copy()
             i_star = i
             v = v_prime
         else:
