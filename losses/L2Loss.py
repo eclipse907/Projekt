@@ -17,7 +17,7 @@ class L2Loss(LossFunction):
 
     def backward_inputs(self, scores):
         dL_ds = self.probs - self.Y_oh  # N x C
-        gradW = np.dot(dL_ds.T, scores)
-        gradb = np.sum(dL_ds.T, axis=1)
+        # gradW = np.dot(dL_ds.T, scores)
+        # gradb = np.sum(dL_ds.T, axis=1)
         # return [gradW, gradb]
         return dL_ds

@@ -12,11 +12,11 @@ class L1SmoothLoss(LossFunction):
         self.scores = scores
         self.Y_oh = np.zeros(scores.shape)
         self.Y_oh[range(scores.shape[0]), self.Y_] = 1
-        lossAllWeights = np.where(np.abs(scores - self.Y_oh) < 1,
-                                  0.5 * np.square(scores - self.Y_oh),
-                                  np.abs(scores - self.Y_oh) - 0.5)
+        self.probs = self.stable_softmax(scores)
         # print(lossAllWeights)
-        regularized_loss = np.sum(lossAllWeights)
+        regularized_loss = np.sum(np.where(np.abs(scores - self.Y_oh) < 1,
+                                  0.5 * np.square(scores - self.Y_oh),
+                                  np.abs(scores - self.Y_oh) - 0.5))
         if self.regularizers:
             for reg in self.regularizers:
                 regularized_loss += reg.forward()
@@ -28,8 +28,7 @@ class L1SmoothLoss(LossFunction):
           Gradient of the smooth L1 loss with respect to the weights.
           :param scores:
         """
-
-        gradAllWeights = np.where(np.abs(self.scores - self.Y_oh) < 1,
+        dL_ds = np.where(np.abs(self.scores - self.Y_oh) < 1,
                                   self.scores - self.Y_oh,
                                   np.sign(self.scores - self.Y_oh))
-        return gradAllWeights
+        return dL_ds

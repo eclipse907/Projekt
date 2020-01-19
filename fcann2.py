@@ -46,7 +46,7 @@ def fcann2_train(X, Y_, param_niter = 10000):
     param_delta = 0.05
     param_lambda = np.exp(-3)
     regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
-    loss = L2Loss(Y_, regularizers)
+    loss = L1SmoothLoss(Y_, regularizers)
     for i in range(param_niter):
         scores1 = np.dot(X, W1) + b1  # N x 5
         hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
