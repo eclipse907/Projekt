@@ -57,15 +57,15 @@ Plotting is optional, it can be disabled by setting is_to_be_plotted value to Fa
 
 # Uncomment this section for a preview of the optimisation using OnevariableFunction class:
 
-"""
-value = "sin(1/x) * x"
+
+value = "x*sin(1/x)"
 
 opt_function = OnevariableFunction(value)
 
-algorithm = "ADAM"
+algorithm = "SGDM"
 
-learning_rate = 0.1
-initial_point = -7
+learning_rate = 0.4
+initial_point = -2
 num_of_iterations = 200
 is_to_be_plotted = True
 momentum = 0.1
@@ -73,4 +73,4 @@ momentum = 0.1
 opt.optimise(algorithm, opt_function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, momentum, beta1=0.9,
              beta2=0.999)
 
-"""
+

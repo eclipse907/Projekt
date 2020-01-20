@@ -17,7 +17,10 @@ def plot(function, values, min_x, max_x):
         plt.clf()
         plt.plot(x, y)
         plt.plot(w, function.__call__(w), 'ro')
+        if i == 1:
+            plt.pause(1.5)
         plt.draw()
         print("Iteration no. " + str(i) + "... Value of the function: " + str(function.__call__(w)))
         i += 1
         plt.pause(0.005)
+    plt.pause(5)

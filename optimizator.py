@@ -34,11 +34,11 @@ class Optimizator:
 
     def __call__(self):
         self.iterations += 1
-        if self.algorithm == "SGD":
+        if self.algorithm.upper() == "SGD":
             return self.__sgd()
-        elif self.algorithm == "SGDM":
+        elif self.algorithm.upper() == "SGDM":
             return self.__sgdm()
-        elif self.algorithm == "ADAM":
+        elif self.algorithm.upper() == "ADAM":
             return self.__adam()
 
     def __sgd(self):
