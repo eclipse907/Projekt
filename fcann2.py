@@ -60,29 +60,6 @@ def train(model, params, lossClass, optimizationClass, gradCheck):
         model.W2 += grad_W2
         model.b2 += -params.learning_rate_bias * grad_b2
 
-def train(model, niter, learning_rate_bias, lossClass, optimizationClass, gradCheck):
-    for i in range(niter):
-        model.forward_pass()
-        loss = lossClass.forward()
-        Gs2 = lossClass.backward_inputs()
-        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
-        reg_grads = lossClass.backward_params()
-
-        grad_W1 += reg_grads[0]
-        grad_W2 += reg_grads[1]
-
-        grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
-        if i % 10 == 0:
-            print("iteration {}: loss {}".format(i, loss))
-            print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
-        model.W1 += grad_W1
-        model.b1 += -learning_rate_bias * grad_b1
-        model.W2 += grad_W2
-        model.b2 += -learning_rate_bias * grad_b2
-
 
 def fcann2_decfun(model):
     def classify(X):
@@ -122,7 +99,8 @@ def findOptimalParams(model0, inSet, outSet, n, p):
     i_star = i
 
     while j < p:
-        train(model, n, paramsModule.learning_rate_bias, lossClass, optimizationClass, gradCheckModule)
+        paramsModule.niter = i_star
+        train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
 
         i = i + n
 
