@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class RegularizerFunction(ABC):
-    def __init__(self, weights, paramsModule):
+    def __init__(self, weights, weight_decay):
         """
         Args:
           weights: parameters which will be regularized
@@ -11,7 +11,7 @@ class RegularizerFunction(ABC):
         """
         # this is still a reference to original tensor so don't change self.weights
         self.weights = weights
-        self.weight_decay = paramsModule.weight_decay
+        self.weight_decay = weight_decay
 
     @abstractmethod
     def forward(self):
