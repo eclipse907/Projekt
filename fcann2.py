@@ -28,7 +28,7 @@ def fcann2_setup_initial_params(X, Y_):
 
 
 
-def fcann2_train(X, Y_, param_niter = 50000):
+def fcann2_train(X, Y_, param_niter = 10000):
     """
     Argumenti
       X: ulazni podaci, dimenzije NxD
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 
     K = 6
     C = 2
-    N = 50
+    N = 10
     X, Y_ = data.sample_gmm_2d(K, C, N)
 
     mask = np.ones((int(K * N * 0.3),), dtype=bool)
