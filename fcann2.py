@@ -40,6 +40,7 @@ class Model:
         newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
         newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
         newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
+        return newModel
 
 
 
@@ -159,8 +160,6 @@ if __name__ == "__main__":
         opt_model, opt_niter, opt_error = findOptimalParams(model.copy(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
 
         model_new = model.copy()
-
-
 
         train(model_new, paramsModule, lossClass, optimizationClass, gradCheckModule)
     else:
