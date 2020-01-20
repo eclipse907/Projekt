@@ -40,4 +40,4 @@ class LossFunction(ABC):
         Y_oh[range(scores.shape[0]), self.Y_] = 1
         probs = self.stable_softmax(scores)
 
-        return self.probs
+        return probs
