@@ -44,7 +44,7 @@ class Model:
 
 
 
-def train(model, params, lossClass, optimizationClass, gradCheck):
+def train(model, params, lossClass):#, optimizationClass, gradCheck):
     for i in range(params.niter):
         model.forward_pass()
         loss = lossClass.forward()
@@ -52,19 +52,19 @@ def train(model, params, lossClass, optimizationClass, gradCheck):
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
         reg_grads = lossClass.backward_params()
 
-        grad_W1 += reg_grads[0]
-        grad_W2 += reg_grads[1]
+        grad_W1 += reg_grads[0].T
+        grad_W2 += reg_grads[1].T
 
-        grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
+       # grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
-            print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
-        model.W1 += grad_W1
+        #    print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
+         #   print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
+          #  print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
+           # print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
+        model.W1 += grad_W1.T
         model.b1 += -params.learning_rate_bias * grad_b1
-        model.W2 += grad_W2
+        model.W2 += grad_W2.T
         model.b2 += -params.learning_rate_bias * grad_b2
 
 
@@ -107,7 +107,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
     while j < p:
         paramsModule.niter = n
-        train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+        train(model, paramsModule, lossClass)#, optimizationClass, gradCheckModule)
 
         i = i + n
 
@@ -129,26 +129,26 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    N = int(input("Unesite broj podataka: "))
-    C = int(input("Unesite broj razreda: "))
-    name = input("Unesite ime modula sa parametrima: ")
-    paramsModule = import_module(name)
-    name = input("Unesite ime modula sa funkcijom gubitka: ")
-    lossModule = import_module(name)
-    name = input("Unesite ime modula sa regularizacijom: ")
-    regularizerModule = import_module(name)
-    confirmation = input("Da li želite koristiti rano zaustavljanje: ")
-    earlyStopping = confirmation.lower() == "da"
-    name = input("Unesite ime modula sa optimizacijom: ")
-    optimizationModule = import_module(name)
-    name = input("Unesite ime modula sa provjerom gradijenta: ")
-    gradCheckModule = import_module(name)
+    N = 10#int(input("Unesite broj podataka: "))
+    C = 6#int(input("Unesite broj razreda: "))
+    #name = input("Unesite ime modula sa parametrima: ")
+    paramsModule = import_module("paramaters")
+    #name = input("Unesite ime modula sa funkcijom gubitka: ")
+    lossModule = import_module("losses.L2Loss")
+    #name = input("Unesite ime modula sa regularizacijom: ")
+    regularizerModule = import_module("regularizers.L2Regularizer")
+    #confirmation = input("Da li želite koristiti rano zaustavljanje: ")
+    earlyStopping = False #confirmation.lower() == "da"
+    #name = input("Unesite ime modula sa optimizacijom: ")
+    #optimizationModule = import_module(name)
+    #name = input("Unesite ime modula sa provjerom gradijenta: ")
+    #gradCheckModule = import_module(name)
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
     regularizerClass = regularizerModule.Regularizer
-    lossClass = lossModule.Loss(model, regularizerClass, paramsModule)
-    algorithm = input("Unesite željenu optimizaciju: ")
-    optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
+    lossClass = lossModule.Loss(model, paramsModule, regularizerClass)
+    #algorithm = input("Unesite željenu optimizaciju: ")
+    #optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
 
 
     if earlyStopping:
@@ -161,9 +161,9 @@ if __name__ == "__main__":
 
         model_new = model.copy()
 
-        train(model_new, paramsModule, lossClass, optimizationClass, gradCheckModule)
+        train(model_new, paramsModule, lossClass)#, optimizationClass, gradCheckModule)
     else:
-        train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+        train(model, paramsModule, lossClass)#, optimizationClass, gradCheckModule)
 
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
