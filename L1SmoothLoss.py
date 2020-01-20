@@ -1,5 +1,5 @@
 import numpy as np
-from losses.LossFunction import LossFunction
+import LossFunction
 
 
 class Loss(LossFunction):

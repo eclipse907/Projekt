@@ -125,8 +125,8 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    N = int(input("Unesite broj podataka: "))
-    C = int(input("Unesite broj razreda: "))
+    N = 100
+    C = 2
     name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module(name)
     name = input("Unesite ime modula sa funkcijom gubitka: ")
