@@ -1,5 +1,5 @@
 import numpy as np
-import RegularizerFunction
+from RegularizerFunction import *
 
 
 class Regularizer(RegularizerFunction):
