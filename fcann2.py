@@ -1,156 +1,107 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import data
-from losses.HingeLoss import HingeLoss
-from losses.L1Loss import L1Loss
-from losses.L1SmoothLoss import L1SmoothLoss
-from losses.L2Loss import L2Loss
-from regularizers.L1Regularizer import L1Regularizer
-from regularizers.L2Regularizer import L2Regularizer
+from importlib import import_module
 
-W1_initial, b1_initial, W2_initial, b2_initial = 0, 0, 0, 0
+class Model:
 
-def fcann2_setup_initial_params(X, Y_):
-    D = X.shape[1]
-    C = max(Y_) + 1
+    def __init__(self, N, D, C):
+        self.N = N
+        self.D = D
+        self.C = C
+        self.W1 = np.random.randn(D, 5)
+        self.b1 = np.random.randn(1, 5)
+        self.W2 = np.random.randn(5, C)
+        self.b2 = np.random.randn(1, C)
 
-    global W1_initial
-    W1_initial = np.random.randn(D, 5)
-    global b1_initial
-    b1_initial = np.random.randn(1, 5)
-    global W2_initial
-    W2_initial = np.random.randn(5, C)
-    global b2_initial
-    b2_initial = np.random.randn(1, C)
+    def random_dataset(self, ncomponents, nclasses, nsamples):
+        self.X, self.Y_ = data.sample_gmm_2d(ncomponents, nclasses, nsamples)
 
-    return W1_initial, b1_initial, W2_initial, b2_initial
+    def init_dataset(self, X, Y_):
+        self.X = X
+        self.Y_ = Y_
+
+    def forward_pass(self):
+        self.scores1 = np.dot(self.X, self.W1) + self.b1  # N x 5
+        self.hiddenLayer1 = np.where(self.scores1 < 0, 0, self.scores1)  # N x 5
+        self.scores2 = np.dot(self.hiddenLayer1, self.W2) + self.b2  # N x C
+
+    def backward_pass(self, Gs2):
+        grad_W2 = np.dot(np.transpose(Gs2), self.hiddenLayer1) / self.N  # C x 5
+        grad_b2 = np.sum(np.transpose(Gs2), axis=1) / self.N  # C x 1
+        Gh1 = np.transpose(np.dot(self.W2, np.transpose(Gs2)))  # N x 5
+        Gs1 = np.where(self.scores1 < 0, 0, Gh1)  # N x 5
+        grad_W1 = np.dot(np.transpose(Gs1), self.X) / self.N  # 5 x D
+        grad_b1 = np.sum(np.transpose(Gs1), axis=1) / self.N  # 5 x 1
+        return grad_W1, grad_b1, grad_W2, grad_b2
 
 
+def train(model, params, lossModule, regularizerModule, optimizationModule, gradCheck):
+    regularizerClass = regularizerModule.Regularizer(model, params)
+    lossClass = lossModule.Loss(model, regularizerClass)
+    algorithm = input("Unesite željenu optimizaciju: ")
+    optimizationClass = optimizationModule.Optimizator(model, params, algorithm)
+    for i in range(params.niter):
+        model.forward_pass()
+        loss = lossClass.forward()
+        Gs2 = lossClass.backward_inputs()
+        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
+        reg_grads = lossClass.backward_params()
+        for grad in reg_grads:
 
-
-def fcann2_train(X, Y_, param_niter = 10000):
-    """
-    Argumenti
-      X: ulazni podaci, dimenzije NxD
-      Y_: točni indeksi, dimenzije Nx1
-    """
-    global W1_initial, b1_initial, W2_initial, b2_initial
-    N = X.shape[0]
-    D = X.shape[1]
-    C = max(Y_) + 1
-
-    W1 = W1_initial
-    b1 = b1_initial
-    W2 = W2_initial
-    b2 = b2_initial
-
-    print("W1 = ", W1)
-    print("W2 = ", W2)
-    print("b1 = ", b1)
-    print("b2 = ", b2)
-
-    param_delta = 0.05
-    param_lambda = np.exp(-3)
-    #regularizers = []
-    #regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
-    regularizers = [L1Regularizer(W1, param_lambda, "l2reg_W1"), L1Regularizer(W2, param_lambda, "l2reg_W2")]
-    loss = L1SmoothLoss(Y_, regularizers)
-    for i in range(param_niter):
-        scores1 = np.dot(X, W1) + b1  # N x 5
-        hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
-        scores2 = np.dot(hiddenLayer1, W2) + b2  # N x C
-        # maxScores2 = np.amax(scores2, axis=1)  # 1 x N
-        # expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
-        # sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
-        # probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
-        # logprobs = np.log(probs[range(N), Y_])  # N x 1
-        # loss = -(np.sum(logprobs) / N)  # skalar
-
-        loss_sum = loss.forward(scores2)
-
+        grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
-            print("iteration {}: loss {}".format(i, loss_sum))
-
-        Gs2 = loss.backward_inputs(scores2)
-        grad_W2 = np.dot(np.transpose(Gs2), hiddenLayer1)  # C x 5
-        grad_b2 = np.sum(np.transpose(Gs2), axis=1)  # C x 1
-        Gh1 = np.transpose(np.dot(W2, np.transpose(Gs2)))  # N x 5
-        Gs1 = Gh1  # N x 5
-        Gs1[Gs1 < 0] = 0
-        grad_W1 = np.dot(np.transpose(Gs1), X)  # 5 x D
-        grad_b1 = np.sum(np.transpose(Gs1), axis=1)  # 5 x 1
-
-        W1 += -param_delta * np.transpose(grad_W1)
-        b1 += -param_delta * grad_b1
-        W2 += -param_delta * np.transpose(grad_W2)
-        b2 += -param_delta * grad_b2
-        for grad in loss.backward_params():
-            grad[0][0] += -param_delta * grad[0][1]
-
-    print("W1 = ", W1)
-    print("W2 = ", W2)
-    print("b1 = ", b1)
-    print("b2 = ", b2)
-
-    return W1, b1, W2, b2
+            print("iteration {}: loss {}".format(i, loss))
+            print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
+        model.W1 += grad_W1
+        model.b1 += -params.learning_rate * grad_b1
+        model.W2 += grad_W2
+        model.b2 += -params.learning_rate * grad_b2
 
 
-def fcann2_classify(X, W1, b1, W2, b2):
-    N = X.shape[0]
-    scores1 = np.dot(X, W1) + b1  # N x 5
-    hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
-    scores2 = np.dot(hiddenLayer1, W2) + b2  # N x C
-    maxScores2 = np.amax(scores2, axis=1)  # 1 x N
-    expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
-    sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
-    probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
-    return probs
-
-
-def fcann2_decfun(W1, b1, W2, b2):
+def fcann2_decfun(model):
     def classify(X):
-        probs = fcann2_classify(X, W1, b1, W2, b2)
+        N = X.shape[0]
+        scores1 = np.dot(X, model.W1) + model.b1  # N x 5
+        hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
+        scores2 = np.dot(hiddenLayer1, model.W2) + model.b2  # N x C
+        maxScores2 = np.amax(scores2, axis=1)  # 1 x N
+        expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
+        sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
+        probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
         return probs[:, 0]
-
     return classify
 
 
 if __name__ == "__main__":
     np.random.seed(100)
-
-    K = 6
-    C = 2
-    N = 10
-    X, Y_ = data.sample_gmm_2d(K, C, N)
-
-    mask = np.ones((int(K * N * 0.3),), dtype=bool)
-    mask = np.hstack((mask, np.zeros((int(K * N * 0.7),), dtype=bool)))
-    np.random.shuffle(mask)
-    Xtest, Y_test = X[mask, :], Y_[mask]
-    Xtrain, Y_train = X[np.logical_not(mask), :], Y_[np.logical_not(mask)]
-
-    fcann2_setup_initial_params(Xtrain, Y_train)
-    W1, b1, W2, b2 = fcann2_train(Xtrain, Y_train)
-    probs = fcann2_classify(Xtrain, W1, b1, W2, b2)
+    N = int(input("Unesite broj podataka: "))
+    C = int(input("Unesite broj razreda: "))
+    name = input("Unesite ime modula sa parametrima: ")
+    paramsModule = import_module(name)
+    name = input("Unesite ime modula sa funkcijom gubitka: ")
+    lossModule = import_module(name)
+    name = input("Unesite ime modula sa regularizacijom: ")
+    regularizerModule = import_module(name)
+    confirmation = input("Da li želite koristiti rano zaustavljanje: ")
+    earlyStopping = confirmation.lower() == "da"
+    name = input("Unesite ime modula sa optimizacijom: ")
+    optimizationModule = import_module(name)
+    name = input("Unesite ime modula sa provjerom gradijenta: ")
+    gradCheckModule = import_module(name)
+    model = Model(N, 2, C)
+    model.random_dataset(5, 2, int(N / 5))
+    train(model, paramsModule, lossModule, regularizerModule, optimizationModule, gradCheckModule)
+    probs = model.forward_pass()
     Y = np.argmax(probs, axis=1)
-
-    acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_train)
-    print("Train set:", acc, prec, conf_matrix)
-
-
-    probs = fcann2_classify(Xtest, W1, b1, W2, b2)
-    Y = np.argmax(probs, axis=1)
-
-    acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_test)
-    print("Test set:", acc, prec, conf_matrix)
-
-    # graph the decision surface
-    decfun = fcann2_decfun(W1, b1, W2, b2)
-    bbox = (np.min(Xtest, axis=0), np.max(Xtest, axis=0))
-    data.graph_surface(decfun, bbox, offset=0.5)
+    decfun = fcann2_decfun(model)
+    rect = (np.min(model.X, axis=0), np.max(model.X, axis=0))
+    data.graph_surface(decfun, rect, offset=0)
 
     # graph the data points
-    data.graph_data(Xtest, Y_test, Y, special=[])
-
+    data.graph_data(model.X, model.Y_, Y, special=[])
 
     plt.show()
