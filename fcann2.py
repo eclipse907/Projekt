@@ -36,19 +36,16 @@ class Model:
         return grad_W1, grad_b1, grad_W2, grad_b2
 
 
-def train(model, params, lossModule, regularizerModule, optimizationModule, gradCheck):
-    regularizerClass = regularizerModule.Regularizer(model, params)
-    lossClass = lossModule.Loss(model, regularizerClass)
-    algorithm = input("Unesite željenu optimizaciju: ")
-    optimizationClass = optimizationModule.Optimizator(model, params, algorithm)
+def train(model, params, lossClass, optimizationClass, gradCheck):
     for i in range(params.niter):
         model.forward_pass()
         loss = lossClass.forward()
         Gs2 = lossClass.backward_inputs()
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
         reg_grads = lossClass.backward_params()
-        for grad in reg_grads:
 
+        grad_W1 += reg_grads[0]
+        grad_W2 += reg_grads[1]
 
         grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
@@ -58,9 +55,9 @@ def train(model, params, lossModule, regularizerModule, optimizationModule, grad
             print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
             print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
         model.W1 += grad_W1
-        model.b1 += -params.learning_rate * grad_b1
+        model.b1 += -params.learning_rate_bias * grad_b1
         model.W2 += grad_W2
-        model.b2 += -params.learning_rate * grad_b2
+        model.b2 += -params.learning_rate_bias * grad_b2
 
 
 def fcann2_decfun(model):
@@ -95,8 +92,12 @@ if __name__ == "__main__":
     gradCheckModule = import_module(name)
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
-    train(model, paramsModule, lossModule, regularizerModule, optimizationModule, gradCheckModule)
-    probs = model.forward_pass()
+    regularizerClass = regularizerModule.Regularizer(model, paramsModule)
+    lossClass = lossModule.Loss(model, regularizerClass)
+    algorithm = input("Unesite željenu optimizaciju: ")
+    optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
+    train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+    probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
     decfun = fcann2_decfun(model)
     rect = (np.min(model.X, axis=0), np.max(model.X, axis=0))
