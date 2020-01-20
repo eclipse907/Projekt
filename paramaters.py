@@ -1,4 +1,5 @@
 niter = 50000
+learning_rate_bias = 0.15
 learning_rate_sgd = 0.1
 learning_rate_sgdm = 0.1
 learning_rate_adam = 0.5

@@ -53,9 +53,9 @@ def train(model, params, lossClass, optimizationClass, gradCheck):
             print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
             print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
         model.W1 += grad_W1
-        model.b1 += -params.learning_rate * grad_b1
+        model.b1 += -params.learning_rate_bias * grad_b1
         model.W2 += grad_W2
-        model.b2 += -params.learning_rate * grad_b2
+        model.b2 += -params.learning_rate_bias * grad_b2
 
 
 def fcann2_decfun(model):
