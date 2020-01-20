@@ -35,23 +35,29 @@ class Model:
         grad_b1 = np.sum(np.transpose(Gs1), axis=1) / self.N  # 5 x 1
         return grad_W1, grad_b1, grad_W2, grad_b2
 
+    def copy(self):
+        newModel = Model(self.N, self.D, self.C)
+        newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
+        newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
+        newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
+        return newModel
 
-def train(model, params, lossClass, optimizationClass, gradCheck):
+
+
+def train(model, params, lossClass, optimizationClass):
     for i in range(params.niter):
         model.forward_pass()
         loss = lossClass.forward()
         Gs2 = lossClass.backward_inputs()
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
         reg_grads = lossClass.backward_params()
+
         grad_W1 += reg_grads[0]
         grad_W2 += reg_grads[1]
+
         grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
-            print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
-            print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
         model.W1 += grad_W1
         model.b1 += -params.learning_rate_bias * grad_b1
         model.W2 += grad_W2
@@ -71,9 +77,56 @@ def fcann2_decfun(model):
         return probs[:, 0]
     return classify
 
+def prepareXYSubtrainAndValidSets(X_train, Y_train):
+    n_samples = X_train.shape[0]
+
+    mask = np.ones((int(n_samples * paramsModule.valid_set_factor),), dtype=bool)
+    mask = np.hstack((mask, np.zeros((int(n_samples * (1 - paramsModule.valid_set_factor)),), dtype=bool)))
+    np.random.shuffle(mask)
+
+    X_valid, Y_valid = X_train[mask, :], Y_train[mask]
+    X_subtrain, Y_subtrain = X_train[np.logical_not(mask), :], Y_train[np.logical_not(mask)]
+
+    return (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+
+# Algorithm 7.1
+def findOptimalParams(model0, inSet, outSet, n, p):
+    X_valid, X_subtrain = inSet[0], inSet[1]
+    Y_valid, Y_subtrain = outSet[0], outSet[1]
+
+    model = model0.copy()
+    i = 0
+    j = 0
+    v = np.inf
+    model_star = model.copy()
+    i_star = i
+
+    while j < p:
+        paramsModule.niter = n
+        train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+
+        i = i + n
+
+        dec_fun = fcann2_decfun(model)
+        probs = dec_fun(X_valid)
+        Y = np.argmax(probs, axis=1)
+        accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
+        v_prime = 1 - accuracy
+
+        if v_prime < v:
+            j = 0
+            model_star = model.copy()
+            i_star = i
+            v = v_prime
+        else:
+            j = j + 1
+
+    return model_star, i_star, v
 
 if __name__ == "__main__":
     np.random.seed(100)
+    N = int(input("Unesite broj podataka: "))
+    C = int(input("Unesite broj razreda: "))
     name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module(name)
     name = input("Unesite ime modula sa funkcijom gubitka: ")
@@ -84,15 +137,28 @@ if __name__ == "__main__":
     earlyStopping = confirmation.lower() == "da"
     name = input("Unesite ime modula sa optimizacijom: ")
     optimizationModule = import_module(name)
-    name = input("Unesite ime modula sa provjerom gradijenta: ")
-    gradCheckModule = import_module(name)
-    model = Model(100, 2, 2)
-    model.random_dataset(5, 2, 20)
-    regularizerClass = regularizerModule.Regularizer(model, paramsModule)
-    lossClass = lossModule.Loss(model, regularizerClass)
+    model = Model(N, 2, C)
+    model.random_dataset(5, 2, int(N / 5))
+    regularizerClass = regularizerModule.Regularizer
+    lossClass = lossModule.Loss(model, regularizerClass, paramsModule)
     algorithm = input("Unesite željenu optimizaciju: ")
     optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
-    train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+
+
+    if earlyStopping:
+        inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)  # return: inOutSets = (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+        inSet = inOutSets[0]
+        outSet = inOutSets[1]
+
+        # find optimal params by early stopping
+        opt_model, opt_niter, opt_error = findOptimalParams(model.copy(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
+
+        model_new = model.copy()
+
+        train(model_new, paramsModule, lossClass, optimizationClass)
+    else:
+        train(model, paramsModule, lossClass, optimizationClass)
+
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
     decfun = fcann2_decfun(model)

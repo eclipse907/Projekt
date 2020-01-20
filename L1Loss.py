@@ -1,7 +1,6 @@
 import numpy as np
 from losses.LossFunction import LossFunction
 
-
 class Loss(LossFunction):
 
     def forward(self):
@@ -9,13 +8,12 @@ class Loss(LossFunction):
         self.Y_oh = np.zeros(self.scores.shape)
         self.Y_oh[range(self.scores.shape[0]), self.Y_] = 1
         self.probs = self.stable_softmax(self.scores)
-        logprobs = np.log(self.probs[range(self.model.N), self.model.Y_])  # N x 1
-        regularized_loss = -(np.sum(logprobs) / self.model.N)  # skalar
+        regularized_loss = np.sum(np.abs(self.probs - self.Y_oh))
         if self.regularizers:
             for reg in self.regularizers:
                 regularized_loss += reg.forward()
         return regularized_loss
 
     def backward_inputs(self):
-        dL_ds = self.probs - self.Y_oh  # N x C
+        dL_ds = np.sign(self.probs - self.Y_oh)
         return dL_ds
