@@ -74,8 +74,6 @@ def fcann2_decfun(model):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    N = int(input("Unesite broj podataka: "))
-    C = int(input("Unesite broj razreda: "))
     name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module(name)
     name = input("Unesite ime modula sa funkcijom gubitka: ")
@@ -88,8 +86,8 @@ if __name__ == "__main__":
     optimizationModule = import_module(name)
     name = input("Unesite ime modula sa provjerom gradijenta: ")
     gradCheckModule = import_module(name)
-    model = Model(N, 2, C)
-    model.random_dataset(5, 2, int(N / 5))
+    model = Model(100, 2, 2)
+    model.random_dataset(5, 2, 20)
     regularizerClass = regularizerModule.Regularizer(model, paramsModule)
     lossClass = lossModule.Loss(model, regularizerClass)
     algorithm = input("Unesite željenu optimizaciju: ")
