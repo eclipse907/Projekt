@@ -10,16 +10,17 @@ class LossFunction(ABC):
         :param regularizers: klasa regularizatora
                              ako je None nema regularizacije
         """
+        self.model = model
         self.Y_ = model.Y_
         self.regularizers = [] if regularizer is None else\
             [regularizer(model.W1, paramsModule.weight_decay), regularizer(model.W2, paramsModule.weight_decay)]
 
     @abstractmethod
-    def forward(self, scores):
+    def forward(self):
         pass
 
     @abstractmethod
-    def backward_inputs(self, scores):
+    def backward_inputs(self):
         pass
 
     def backward_params(self):
