@@ -4,12 +4,12 @@ import numpy as np
 
 class LossFunction(ABC):
 
-    def __init__(self, Y_, regularizers):
+    def __init__(self, model, regularizers):
         """
         :param Y_: array tocnih klasa, N x 1
         :param regularizers: lista regularizatora
         """
-        self.Y_ = Y_
+        self.Y_ = model.Y_
         self.regularizers = regularizers
 
     @abstractmethod

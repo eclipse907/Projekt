@@ -1,8 +1,8 @@
 import numpy as np
-from regularizers.Regularizer import *
+from regularizers.RegularizerFunction import *
 
 
-class L2Regularizer(Regularizer):
+class Regularizer(RegularizerFunction):
 
     def forward(self):
         """

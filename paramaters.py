@@ -10,3 +10,4 @@ epsilon = 1e-8
 valid_set_factor = 0.3
 n_eval = 5
 patience = 100
+weight_decay = 1e-3

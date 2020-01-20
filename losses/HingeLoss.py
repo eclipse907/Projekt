@@ -1,12 +1,7 @@
-from losses.LossFunction import *
 import numpy as np
+from losses.LossFunction import *
 
-
-class HingeLoss(LossFunction):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args)
-        self.margin = kwargs.get('margin', 1)
+class Loss(LossFunction):
 
     def forward(self, scores):
         self.Y_oh = np.zeros(scores.shape)

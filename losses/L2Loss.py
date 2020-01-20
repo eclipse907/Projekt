@@ -1,8 +1,8 @@
-from losses.LossFunction import *
 import numpy as np
+from losses.LossFunction import *
 
 
-class L2Loss(LossFunction):
+class Loss(LossFunction):
 
     def forward(self, scores):
         self.logits = scores

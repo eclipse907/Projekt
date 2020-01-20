@@ -2,7 +2,7 @@ import numpy as np
 from losses.LossFunction import *
 
 
-class L1SmoothLoss(LossFunction):
+class Loss(LossFunction):
 
     def forward(self, scores):
         """
