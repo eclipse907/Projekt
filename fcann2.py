@@ -129,14 +129,14 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    N = 10#int(input("Unesite broj podataka: "))
-    C = 6#int(input("Unesite broj razreda: "))
+    N = 100#int(input("Unesite broj podataka: "))
+    C = 4#int(input("Unesite broj razreda: "))
     #name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module("paramaters")
     #name = input("Unesite ime modula sa funkcijom gubitka: ")
-    lossModule = import_module("losses.L2Loss")
+    lossModule = import_module("losses.CrossEntropyLoss")
     #name = input("Unesite ime modula sa regularizacijom: ")
-    regularizerModule = import_module("regularizers.L2Regularizer")
+    regularizerModule = import_module("regularizers.L1Regularizer")
     #confirmation = input("Da li želite koristiti rano zaustavljanje: ")
     earlyStopping = False #confirmation.lower() == "da"
     #name = input("Unesite ime modula sa optimizacijom: ")
