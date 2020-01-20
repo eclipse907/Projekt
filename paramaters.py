@@ -1,2 +1,2 @@
 niter = 50000
-delta = 0.26
+learning_rate = 0.26
