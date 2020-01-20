@@ -36,6 +36,7 @@ class Model:
         return grad_W1, grad_b1, grad_W2, grad_b2
 
 
+
 def train(model, params, lossClass, optimizationClass, gradCheck):
     for i in range(params.niter):
         model.forward_pass()
@@ -59,6 +60,29 @@ def train(model, params, lossClass, optimizationClass, gradCheck):
         model.W2 += grad_W2
         model.b2 += -params.learning_rate_bias * grad_b2
 
+def train(model, niter, learning_rate_bias, lossClass, optimizationClass, gradCheck):
+    for i in range(niter):
+        model.forward_pass()
+        loss = lossClass.forward()
+        Gs2 = lossClass.backward_inputs()
+        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
+        reg_grads = lossClass.backward_params()
+
+        grad_W1 += reg_grads[0]
+        grad_W2 += reg_grads[1]
+
+        grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
+        if i % 10 == 0:
+            print("iteration {}: loss {}".format(i, loss))
+            print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta W2: {}".format(gradCheck.checkGrad()))
+            print("Razlika gradijenta b2: {}".format(gradCheck.checkGrad()))
+        model.W1 += grad_W1
+        model.b1 += -learning_rate_bias * grad_b1
+        model.W2 += grad_W2
+        model.b2 += -learning_rate_bias * grad_b2
+
 
 def fcann2_decfun(model):
     def classify(X):
@@ -73,6 +97,50 @@ def fcann2_decfun(model):
         return probs[:, 0]
     return classify
 
+def prepareXYSubtrainAndValidSets(X_train, Y_train):
+    n_samples = X_train.shape[0]
+
+    mask = np.ones((int(n_samples * paramsModule.valid_set_factor),), dtype=bool)
+    mask = np.hstack((mask, np.zeros((int(n_samples * (1 - paramsModule.valid_set_factor)),), dtype=bool)))
+    np.random.shuffle(mask)
+
+    X_valid, Y_valid = X_train[mask, :], Y_train[mask]
+    X_subtrain, Y_subtrain = X_train[np.logical_not(mask), :], Y_train[np.logical_not(mask)]
+
+    return (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+
+# Algorithm 7.1
+def findOptimalParams(model0, inSet, outSet, n, p):
+    X_valid, X_subtrain = inSet[0], inSet[1]
+    Y_valid, Y_subtrain = outSet[0], outSet[1]
+
+    model = model0.clone()
+    i = 0
+    j = 0
+    v = np.inf
+    model_star = model.clone()
+    i_star = i
+
+    while j < p:
+        train(model, n, paramsModule.learning_rate_bias, lossClass, optimizationClass, gradCheckModule)
+
+        i = i + n
+
+        dec_fun = fcann2_decfun(model)
+        probs = dec_fun(X_valid)
+        Y = np.argmax(probs, axis=1)
+        accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
+        v_prime = 1 - accuracy
+
+        if v_prime < v:
+            j = 0
+            model_star = model.clone()
+            i_star = i
+            v = v_prime
+        else:
+            j = j + 1
+
+    return model_star, i_star, v
 
 if __name__ == "__main__":
     np.random.seed(100)
@@ -99,47 +167,21 @@ if __name__ == "__main__":
 
 
     if earlyStopping:
-        n_samples = model.X.shape[0]
+        inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)  # return: inOutSets = (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+        inSet = inOutSets[0]
+        outSet = inOutSets[1]
 
-        mask = np.ones((int(n_samples * paramsModule.valid_set_factor),), dtype=bool)
-        mask = np.hstack((mask, np.zeros((int(n_samples * (1 - paramsModule.valid_set_factor)),), dtype=bool)))
-        np.random.shuffle(mask)
+        # find optimal params by early stopping
+        opt_model, opt_niter, opt_error = findOptimalParams(model.clone(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
 
-        X_valid, Y_valid = model.X[mask, :], model.Y_[mask]
-        X_subtrain, Y_subtrain = model.X[np.logical_not(mask), :], model.Y_[np.logical_not(mask)]
+        model_new = model.clone()
 
-        i = 0
-        j = 0
-        v = np.inf
-        W1_star, b1_star, W2_star, b2_star = model.W1.copy(), model.b1.copy(), model.W2.copy(), model.b2.copy()
-        i_star = i
 
-        n = paramsModule.n_eval
-        p = paramsModule.patience
 
-        while j < p:
-            model.X, model.Y_ = X_subtrain, Y_subtrain
-            train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+        train(model_new, paramsModule, lossClass, optimizationClass, gradCheckModule)
+    else:
+        train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
 
-            i = i + n
-
-            dec_fun = fcann2_decfun(model)
-            probs = dec_fun(X_valid)
-            Y = np.argmax(probs, axis=1)
-            accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
-            v_prime = 1 - accuracy
-
-            if v_prime < v:
-                j = 0
-                W1_star, b1_star, W2_star, b2_star = model.W1.copy(), model.b1.copy(), model.W2.copy(), model.b2.copy()
-                i_star = i
-                v = v_prime
-            else:
-                j = j + 1
-
-        model.X, model.Y_ = X_subtrain, Y_subtrain
-
-    train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
     decfun = fcann2_decfun(model)
