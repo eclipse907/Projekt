@@ -92,8 +92,8 @@ if __name__ == "__main__":
     gradCheckModule = import_module(name)
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
-    regularizerClass = regularizerModule.Regularizer(model, paramsModule)
-    lossClass = lossModule.Loss(model, regularizerClass)
+    regularizerClass = regularizerModule.Regularizer
+    lossClass = lossModule.Loss(model, regularizerClass, paramsModule)
     algorithm = input("Unesite željenu optimizaciju: ")
     optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
 
