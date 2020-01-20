@@ -96,6 +96,49 @@ if __name__ == "__main__":
     lossClass = lossModule.Loss(model, regularizerClass)
     algorithm = input("Unesite željenu optimizaciju: ")
     optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
+
+
+    if earlyStopping:
+        n_samples = model.X.shape[0]
+
+        mask = np.ones((int(n_samples * paramsModule.valid_set_factor),), dtype=bool)
+        mask = np.hstack((mask, np.zeros((int(n_samples * (1 - paramsModule.valid_set_factor)),), dtype=bool)))
+        np.random.shuffle(mask)
+
+        X_valid, Y_valid = model.X[mask, :], model.Y_[mask]
+        X_subtrain, Y_subtrain = model.X[np.logical_not(mask), :], model.Y_[np.logical_not(mask)]
+
+        i = 0
+        j = 0
+        v = np.inf
+        W1_star, b1_star, W2_star, b2_star = model.W1.copy(), model.b1.copy(), model.W2.copy(), model.b2.copy()
+        i_star = i
+
+        n = paramsModule.n_eval
+        p = paramsModule.patience
+
+        while j < p:
+            model.X, model.Y_ = X_subtrain, Y_subtrain
+            train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+
+            i = i + n
+
+            dec_fun = fcann2_decfun(model)
+            probs = dec_fun(X_valid)
+            Y = np.argmax(probs, axis=1)
+            accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
+            v_prime = 1 - accuracy
+
+            if v_prime < v:
+                j = 0
+                W1_star, b1_star, W2_star, b2_star = model.W1.copy(), model.b1.copy(), model.W2.copy(), model.b2.copy()
+                i_star = i
+                v = v_prime
+            else:
+                j = j + 1
+
+        model.X, model.Y_ = X_subtrain, Y_subtrain
+
     train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
