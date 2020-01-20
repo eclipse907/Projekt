@@ -24,17 +24,9 @@ class Model:
     def forward_pass(self):
         self.scores1 = np.dot(self.X, self.W1) + self.b1  # N x 5
         self.hiddenLayer1 = np.where(self.scores1 < 0, 0, self.scores1)  # N x 5
-        scores2 = np.dot(self.hiddenLayer1, self.W2) + self.b2  # N x C
-        maxScores2 = np.amax(scores2, axis=1)  # 1 x N
-        expscores2 = np.exp(scores2 - maxScores2.reshape((self.N, 1)))  # N x C
-        sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
-        probs = expscores2 / sumexp2.reshape((self.N, 1))  # N x C
-        return probs
+        self.scores2 = np.dot(self.hiddenLayer1, self.W2) + self.b2  # N x C
 
-    def backward_pass(self, probs):
-        Yij = np.zeros((self.N, self.C))
-        Yij[range(self.N), self.Y_] = 1
-        Gs2 = probs - Yij  # N x C
+    def backward_pass(self, Gs2):
         grad_W2 = np.dot(np.transpose(Gs2), self.hiddenLayer1) / self.N  # C x 5
         grad_b2 = np.sum(np.transpose(Gs2), axis=1) / self.N  # C x 1
         Gh1 = np.transpose(np.dot(self.W2, np.transpose(Gs2)))  # N x 5
@@ -44,11 +36,14 @@ class Model:
         return grad_W1, grad_b1, grad_W2, grad_b2
 
 
-def train(model, params, loss, regularizer, optimization, gradCheck):
+def train(model, params, lossModule, regularizerModule, optimization, gradCheck):
+    regularizerClass = regularizerModule.Regularizer(model, params)
+    lossClass = lossModule.Loss(model, regularizerClass)
     for i in range(params.niter):
-        probs = model.forward_pass()
-        loss = loss.loss_func(model, probs, regularizer)
-        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(probs)
+        model.forward_pass()
+        loss = lossClass.forward()
+        Gs2 = lossClass.backward_inputs()
+        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
             print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
@@ -59,6 +54,7 @@ def train(model, params, loss, regularizer, optimization, gradCheck):
         model.b1 += -params.delta * grad_b1
         model.W2 += -params.delta * np.transpose(grad_W2)
         model.b2 += -params.delta * grad_b2
+        reg_grads = lossClass.backward_params()
 
 
 def fcann2_decfun(model):
@@ -79,21 +75,23 @@ if __name__ == "__main__":
     np.random.seed(100)
     N = int(input("Unesite broj podataka: "))
     C = int(input("Unesite broj razreda: "))
-    model = Model(N, 2, C)
-    model.random_dataset(5, 2, int(N / 5))
     name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module(name)
     name = input("Unesite ime modula sa funkcijom gubitka: ")
     lossModule = import_module(name)
     name = input("Unesite ime modula sa regularizacijom: ")
     regularizerModule = import_module(name)
+    confirmation = input("Da li želite koristiti rano zaustavljanje: ")
+    earlyStopping = confirmation.lower() == "da"
     name = input("Unesite ime modula sa optimizacijom: ")
     optimizationModule = import_module(name)
     name = input("Unesite ime modula sa provjerom gradijenta: ")
     gradCheckModule = import_module(name)
+    model = Model(N, 2, C)
+    model.random_dataset(5, 2, int(N / 5))
     train(model, paramsModule, lossModule, regularizerModule, optimizationModule, gradCheckModule)
     probs = model.forward_pass()
-    Y = np.argwhere(np.around(probs))[:, 1]
+    Y = np.argmax(probs, axis=1)
     decfun = fcann2_decfun(model)
     rect = (np.min(model.X, axis=0), np.max(model.X, axis=0))
     data.graph_surface(decfun, rect, offset=0)
