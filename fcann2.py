@@ -5,6 +5,7 @@ from losses.HingeLoss import HingeLoss
 from losses.L1Loss import L1Loss
 from losses.L1SmoothLoss import L1SmoothLoss
 from losses.L2Loss import L2Loss
+from regularizers.L1Regularizer import L1Regularizer
 from regularizers.L2Regularizer import L2Regularizer
 
 W1_initial, b1_initial, W2_initial, b2_initial = 0, 0, 0, 0
@@ -27,7 +28,7 @@ def fcann2_setup_initial_params(X, Y_):
 
 
 
-def fcann2_train(X, Y_, param_niter = 10000):
+def fcann2_train(X, Y_, param_niter = 50000):
     """
     Argumenti
       X: ulazni podaci, dimenzije NxD
@@ -43,9 +44,16 @@ def fcann2_train(X, Y_, param_niter = 10000):
     W2 = W2_initial
     b2 = b2_initial
 
+    print("W1 = ", W1)
+    print("W2 = ", W2)
+    print("b1 = ", b1)
+    print("b2 = ", b2)
+
     param_delta = 0.05
     param_lambda = np.exp(-3)
-    regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
+    #regularizers = []
+    #regularizers = [L2Regularizer(W1, param_lambda, "l2reg_W1"), L2Regularizer(W2, param_lambda, "l2reg_W2")]
+    regularizers = [L1Regularizer(W1, param_lambda, "l2reg_W1"), L1Regularizer(W2, param_lambda, "l2reg_W2")]
     loss = L1SmoothLoss(Y_, regularizers)
     for i in range(param_niter):
         scores1 = np.dot(X, W1) + b1  # N x 5
@@ -78,6 +86,12 @@ def fcann2_train(X, Y_, param_niter = 10000):
         b2 += -param_delta * grad_b2
         for grad in loss.backward_params():
             grad[0][0] += -param_delta * grad[0][1]
+
+    print("W1 = ", W1)
+    print("W2 = ", W2)
+    print("b1 = ", b1)
+    print("b2 = ", b2)
+
     return W1, b1, W2, b2
 
 
@@ -103,19 +117,40 @@ def fcann2_decfun(W1, b1, W2, b2):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    X, Y_ = data.sample_gmm_2d(6, 2, 10)
-    fcann2_setup_initial_params(X, Y_)
-    W1, b1, W2, b2 = fcann2_train(X, Y_)
-    probs = fcann2_classify(X, W1, b1, W2, b2)
+
+    K = 6
+    C = 2
+    N = 50
+    X, Y_ = data.sample_gmm_2d(K, C, N)
+
+    mask = np.ones((int(K * N * 0.3),), dtype=bool)
+    mask = np.hstack((mask, np.zeros((int(K * N * 0.7),), dtype=bool)))
+    np.random.shuffle(mask)
+    Xtest, Y_test = X[mask, :], Y_[mask]
+    Xtrain, Y_train = X[np.logical_not(mask), :], Y_[np.logical_not(mask)]
+
+    fcann2_setup_initial_params(Xtrain, Y_train)
+    W1, b1, W2, b2 = fcann2_train(Xtrain, Y_train)
+    probs = fcann2_classify(Xtrain, W1, b1, W2, b2)
     Y = np.argmax(probs, axis=1)
 
-    acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_)
+    acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_train)
+    print("Train set:", acc, prec, conf_matrix)
 
+
+    probs = fcann2_classify(Xtest, W1, b1, W2, b2)
+    Y = np.argmax(probs, axis=1)
+
+    acc, prec, conf_matrix = data.eval_perf_multi(Y, Y_test)
+    print("Test set:", acc, prec, conf_matrix)
+
+    # graph the decision surface
     decfun = fcann2_decfun(W1, b1, W2, b2)
-    rect = (np.min(X, axis=0), np.max(X, axis=0))
-    data.graph_surface(decfun, rect, offset=0)
+    bbox = (np.min(Xtest, axis=0), np.max(Xtest, axis=0))
+    data.graph_surface(decfun, bbox, offset=0.5)
 
     # graph the data points
-    data.graph_data(X, Y_, Y, special=[])
+    data.graph_data(Xtest, Y_test, Y, special=[])
+
 
     plt.show()
