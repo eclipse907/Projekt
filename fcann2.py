@@ -35,6 +35,12 @@ class Model:
         grad_b1 = np.sum(np.transpose(Gs1), axis=1) / self.N  # 5 x 1
         return grad_W1, grad_b1, grad_W2, grad_b2
 
+    def copy(self):
+        newModel = Model(self.N, self.D, self.C)
+        newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
+        newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
+        newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
+
 
 def train(model, params, lossClass, optimizationClass, gradCheck):
     for i in range(params.niter):
