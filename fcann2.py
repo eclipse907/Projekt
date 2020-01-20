@@ -49,6 +49,7 @@ def train(model, params, lossModule, regularizerModule, optimizationModule, grad
         reg_grads = lossClass.backward_params()
         for grad in reg_grads:
 
+
         grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))

@@ -34,3 +34,10 @@ class LossFunction(ABC):
         sumexp = np.sum(expscores, axis=1)  # N x 1
         probs = expscores / sumexp.reshape((N, 1))  # N x C
         return probs
+
+    def get_probs_from_scores(self, scores):
+        Y_oh = np.zeros(scores.shape)
+        Y_oh[range(scores.shape[0]), self.Y_] = 1
+        probs = self.stable_softmax(scores)
+
+        return self.probs
