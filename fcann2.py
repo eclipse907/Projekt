@@ -91,15 +91,15 @@ def findOptimalParams(model0, inSet, outSet, n, p):
     X_valid, X_subtrain = inSet[0], inSet[1]
     Y_valid, Y_subtrain = outSet[0], outSet[1]
 
-    model = model0.clone()
+    model = model0.copy()
     i = 0
     j = 0
     v = np.inf
-    model_star = model.clone()
+    model_star = model.copy()
     i_star = i
 
     while j < p:
-        paramsModule.niter = i_star
+        paramsModule.niter = n
         train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
 
         i = i + n
@@ -112,7 +112,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
         if v_prime < v:
             j = 0
-            model_star = model.clone()
+            model_star = model.copy()
             i_star = i
             v = v_prime
         else:
@@ -150,9 +150,9 @@ if __name__ == "__main__":
         outSet = inOutSets[1]
 
         # find optimal params by early stopping
-        opt_model, opt_niter, opt_error = findOptimalParams(model.clone(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
+        opt_model, opt_niter, opt_error = findOptimalParams(model.copy(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
 
-        model_new = model.clone()
+        model_new = model.copy()
 
 
 
