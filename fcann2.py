@@ -52,15 +52,15 @@ def train(model, params, lossClass, optimizationClass):
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
         reg_grads = lossClass.backward_params()
 
-        grad_W1 += reg_grads[0]
-        grad_W2 += reg_grads[1]
+        grad_W1 += np.transpose(reg_grads[0])
+        grad_W2 += np.transpose(reg_grads[1])
 
         grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
-        model.W1 += grad_W1
+        model.W1 += np.transpose(grad_W1)
         model.b1 += -params.learning_rate_bias * grad_b1
-        model.W2 += grad_W2
+        model.W2 += np.transpose(grad_W2)
         model.b2 += -params.learning_rate_bias * grad_b2
 
 
@@ -103,7 +103,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
     while j < p:
         paramsModule.niter = n
-        train(model, paramsModule, lossClass, optimizationClass, gradCheckModule)
+        train(model, paramsModule, lossClass, optimizationClass)
 
         i = i + n
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
 
     if earlyStopping:
-        inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)  # return: inOutSets = (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+        inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)
         inSet = inOutSets[0]
         outSet = inOutSets[1]
 
