@@ -18,4 +18,5 @@ class L2Regularizer(Regularizer):
           Gradient of the L2 loss with respect to the regularized weights.
         """
         grad_weights = self.weight_decay * self.weights
-        return [[self.weights, grad_weights], self.name]
+        #return [[self.weights, grad_weights], self.name]
+        return grad_weights
