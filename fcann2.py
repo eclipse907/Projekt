@@ -140,7 +140,7 @@ if __name__ == "__main__":
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
     regularizerClass = regularizerModule.Regularizer
-    lossClass = lossModule.Loss(model, regularizerClass, paramsModule)
+    lossClass = lossModule.Loss(model, paramsModule, regularizerClass)
     algorithm = input("Unesite željenu optimizaciju: ")
     optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
 
