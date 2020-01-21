@@ -1,43 +1,43 @@
 import numpy as np
 
 
-def checkGrad(self, X):
+def check_grad(grad, model, params, loss_class):
     # Numerički izačunati gradijent
-    numGrad = self.computeNumericalGradient(X)
-
-    self.forward_backward_f(X)
-    grad = np.concatenate((self.dW.ravel(), self.dB.ravel()))
+    numGrad = compute_numerical_gradient(model, params, loss_class)
 
     # Usporedi
     brojnik = np.linalg.norm(grad - numGrad)
     nazivnik = np.linalg.norm(grad) + np.linalg.norm(numGrad)
     diff = brojnik / nazivnik
-    if diff < self.tolerance:
+    if diff < params.tolerance:
         str = 'Dobar'
     else:
         str = 'Loš'
-    print('{0} gradijent. Razlika = {1}'.format(str, diff))
-    self.gradDiff.append(diff)
+    return '{0} gradijent. Razlika = {1}'.format(str, diff)
 
 
-def computeNumericalGradient(self, X):
-    weights = self.get_wb()
+def compute_numerical_gradient(model, params, loss_class):
+    # Get the parameters (weights & biases)
+    weights = model.get_params()
     h_vector = np.zeros(weights.shape)
-    numGrad = np.zeros(weights.shape)
+    num_grad = np.zeros(weights.shape)
 
     for i in range(len(weights)):
-        h_vector[i] = self.h
+        h_vector[i] = params.h
 
-        self.setWeights(weights + h_vector)
-        prob = self.forward_f(X)
-        f_plus = self.costFunction(prob, self.novi_Y)
+        model.set_params(weights + h_vector)
+        model.forward_pass()
+        f_plus = loss_class.forward()
 
-        self.setWeights(weights - h_vector)
-        prob = self.forward_f(X)
-        f_minus = self.costFunction(prob, self.novi_Y)
+        model.set_params(weights - h_vector)
+        model.forward_pass()
+        f_minus = loss_class.forward()
+
         # Izračunaj numerički gradijent
-        numGrad[i] = (f_plus - f_minus) / (2 * self.h)
+        num_grad[i] = (f_plus - f_minus) / (2 * params.h)
         h_vector[i] = 0
+
     # Resetiraj težine
-    self.setWeights(weights)
-    return numGrad
+    model.set_params(weights)
+
+    return num_grad

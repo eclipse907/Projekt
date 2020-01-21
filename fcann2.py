@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import data
 from importlib import import_module
-
+from grad_check import check_grad, compute_numerical_gradient
 class Model:
 
     def __init__(self, N, D, C):
@@ -65,10 +65,16 @@ def train(model, params, lossClass, optimizationClass):
         loss = lossClass.forward()
         Gs2 = lossClass.backward_inputs()
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
+
+        if i % 100 == 0:
+            grad = np.concatenate((grad_W1.ravel(), grad_W2.ravel(), grad_b1.ravel(), grad_b2.ravel()))
+            message = check_grad(grad, model, params, lossClass)
+            print(message)
         reg_grads = lossClass.backward_params()
 
         grad_W1 += np.transpose(reg_grads[0])
         grad_W2 += np.transpose(reg_grads[1])
+
 
         grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
