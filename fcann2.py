@@ -25,6 +25,7 @@ class Model:
         self.scores1 = np.dot(self.X, self.W1) + self.b1  # N x 5
         self.hiddenLayer1 = np.where(self.scores1 < 0, 0, self.scores1)  # N x 5
         self.scores2 = np.dot(self.hiddenLayer1, self.W2) + self.b2  # N x C
+        print()
 
     def backward_pass(self, Gs2):
         grad_W2 = np.dot(np.transpose(Gs2), self.hiddenLayer1) / self.N  # C x 5
@@ -40,6 +41,7 @@ class Model:
         newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
         newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
         newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
+        newModel.scores2 = self.scores2.copy()
         return newModel
 
 
@@ -50,13 +52,15 @@ def train(model, params, lossClass):#, optimizationClass, gradCheck):
         loss = lossClass.forward()
         Gs2 = lossClass.backward_inputs()
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
-        reg_grads = lossClass.backward_params()
 
-        grad_W1 += reg_grads[0].T
-        grad_W2 += reg_grads[1].T
+        if lossClass.regularizers:
+            reg_grads = lossClass.backward_params()
+
+            grad_W1 += reg_grads[0].T
+            grad_W2 += reg_grads[1].T
 
        # grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
-        if i % 10 == 0:
+        if i % 1 == 0:
             print("iteration {}: loss {}".format(i, loss))
         #    print("Razlika gradijenta W1: {}".format(gradCheck.checkGrad()))
          #   print("Razlika gradijenta b1: {}".format(gradCheck.checkGrad()))
@@ -113,7 +117,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
         dec_fun = fcann2_decfun(model)
         probs = dec_fun(X_valid)
-        Y = np.argmax(probs, axis=1)
+        Y = np.argmax(probs, axis=0)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
         v_prime = 1 - accuracy
 
@@ -129,30 +133,31 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
 if __name__ == "__main__":
     np.random.seed(100)
-    N = 100#int(input("Unesite broj podataka: "))
-    C = 4#int(input("Unesite broj razreda: "))
+    N = 10#int(input("Unesite broj podataka: "))
+    C = 10#int(input("Unesite broj razreda: "))
     #name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module("paramaters")
     #name = input("Unesite ime modula sa funkcijom gubitka: ")
     lossModule = import_module("losses.CrossEntropyLoss")
+    #lossModule = import_module("losses.L2Loss")
     #name = input("Unesite ime modula sa regularizacijom: ")
-    regularizerModule = import_module("regularizers.L1Regularizer")
-    #confirmation = input("Da li želite koristiti rano zaustavljanje: ")
-    earlyStopping = False #confirmation.lower() == "da"
+    #regularizerModule = import_module("regularizers.L2Regularizer")
+    confirmation = input("Da li želite koristiti rano zaustavljanje: ")
+    earlyStopping = confirmation.lower() == "da"
     #name = input("Unesite ime modula sa optimizacijom: ")
     #optimizationModule = import_module(name)
     #name = input("Unesite ime modula sa provjerom gradijenta: ")
     #gradCheckModule = import_module(name)
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
-    regularizerClass = regularizerModule.Regularizer
-    lossClass = lossModule.Loss(model, paramsModule, regularizerClass)
+    #regularizerClass = regularizerModule.Regularizer
+    #lossClass = lossModule.Loss(model, paramsModule, regularizerClass)
+    lossClass = lossModule.Loss(model, paramsModule, None)
 
     #algorithm = input("Unesite željenu optimizaciju: ")
     #optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
 
-
-
+    model.forward_pass()
     if earlyStopping:
         inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)  # return: inOutSets = (X_valid, X_subtrain), (Y_valid, Y_subtrain)
         inSet = inOutSets[0]
@@ -163,10 +168,10 @@ if __name__ == "__main__":
 
         model_new = model.copy()
 
-        train(model_new, paramsModule, lossClass)#, optimizationClass, gradCheckModule)
-    else:
-        train(model, paramsModule, lossClass)#, optimizationClass, gradCheckModule)
+        model = model_new
 
+    print("training...")
+    train(model, paramsModule, lossClass)  # , optimizationClass, gradCheckModule)
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
     decfun = fcann2_decfun(model)
