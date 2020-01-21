@@ -43,6 +43,7 @@ class Model:
         newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
         newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
         newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
+        newModel.scores2 = self.scores2.copy()
         return newModel
 
     def get_params(self):
@@ -73,10 +74,12 @@ def train(model, params, lossClass, optimizationClass):
             grad = np.concatenate((grad_W1.ravel(), grad_W2.ravel(), grad_b1.ravel(), grad_b2.ravel()))
             message = check_grad(grad, model, params, lossClass)
             print(message)
-        reg_grads = lossClass.backward_params()
 
-        grad_W1 += np.transpose(reg_grads[0])
-        grad_W2 += np.transpose(reg_grads[1])
+        if lossClass.regularizers:
+            reg_grads = lossClass.backward_params()
+
+            grad_W1 += reg_grads[0].T
+            grad_W2 += reg_grads[1].T
 
 
         grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
@@ -133,7 +136,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
         dec_fun = fcann2_decfun(model)
         probs = dec_fun(X_valid)
-        Y = np.argmax(probs, axis=1)
+        Y = np.argmax(probs, axis=0)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
         v_prime = 1 - accuracy
 
@@ -166,6 +169,7 @@ if __name__ == "__main__":
     lossClass = lossModule.Loss(model, paramsModule, None)
     algorithm = input("Unesite željenu optimizaciju: ")
     optimizationClass = optimizator.Optimizator(model, paramsModule, algorithm if algorithm else "SGD")
+    model.forward_pass()
 
     if earlyStopping:
         inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)
