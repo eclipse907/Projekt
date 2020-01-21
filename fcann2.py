@@ -2,7 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import data
 from importlib import import_module
-from grad_check import check_grad, compute_numerical_gradient
+from grad_check import check_grad
+import optimizator
+
+
 class Model:
 
     def __init__(self, N, D, C):
@@ -144,6 +147,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
     return model_star, i_star, v
 
+
 if __name__ == "__main__":
     np.random.seed(100)
     N = 100
@@ -152,30 +156,24 @@ if __name__ == "__main__":
     paramsModule = import_module(name if name else "paramaters")
     name = input("Unesite ime modula sa funkcijom gubitka: ")
     lossModule = import_module(name if name else "L1Loss")
-    name = input("Unesite ime modula sa regularizacijom: ")
-    regularizerModule = import_module(name if name else "L1Regularizer")
+    # name = input("Unesite ime modula sa regularizacijom: ")
+    # regularizerModule = import_module(name if name else "L1Regularizer")
     confirmation = input("Da li želite koristiti rano zaustavljanje: ")
     earlyStopping = confirmation.lower() == "da"
-    name = input("Unesite ime modula sa optimizacijom: ")
-    optimizationModule = import_module(name if name else "optimizator")
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
-    regularizerClass = regularizerModule.Regularizer
-    lossClass = lossModule.Loss(model, paramsModule, regularizerClass)
+    # regularizerClass = regularizerModule.Regularizer
+    lossClass = lossModule.Loss(model, paramsModule, None)
     algorithm = input("Unesite željenu optimizaciju: ")
-    optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm if algorithm else "SGD")
-
+    optimizationClass = optimizator.Optimizator(model, paramsModule, algorithm if algorithm else "SGD")
 
     if earlyStopping:
         inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)
         inSet = inOutSets[0]
         outSet = inOutSets[1]
-
         # find optimal params by early stopping
         opt_model, opt_niter, opt_error = findOptimalParams(model.copy(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
-
         model_new = model.copy()
-
         train(model_new, paramsModule, lossClass, optimizationClass)
     else:
         train(model, paramsModule, lossClass, optimizationClass)
