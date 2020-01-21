@@ -143,21 +143,21 @@ if __name__ == "__main__":
     N = 100
     C = 2
     name = input("Unesite ime modula sa parametrima: ")
-    paramsModule = import_module(name)
+    paramsModule = import_module(name if name else "paramaters")
     name = input("Unesite ime modula sa funkcijom gubitka: ")
-    lossModule = import_module(name)
+    lossModule = import_module(name if name else "L1Loss")
     name = input("Unesite ime modula sa regularizacijom: ")
-    regularizerModule = import_module(name)
+    regularizerModule = import_module(name if name else "L1Regularizer")
     confirmation = input("Da li želite koristiti rano zaustavljanje: ")
     earlyStopping = confirmation.lower() == "da"
     name = input("Unesite ime modula sa optimizacijom: ")
-    optimizationModule = import_module(name)
+    optimizationModule = import_module(name if name else "optimizator")
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
     regularizerClass = regularizerModule.Regularizer
     lossClass = lossModule.Loss(model, paramsModule, regularizerClass)
     algorithm = input("Unesite željenu optimizaciju: ")
-    optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm)
+    optimizationClass = optimizationModule.Optimizator(model, paramsModule, algorithm if algorithm else "SGD")
 
 
     if earlyStopping:
