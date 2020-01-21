@@ -42,6 +42,21 @@ class Model:
         newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
         return newModel
 
+    def get_params(self):
+        return np.concatenate((self.W1.ravel(), self.W2.ravel(), self.b1.ravel(), self.b2.ravel()))
+
+    def set_params(self, weights):
+        W1_end = self.D*5
+        self.W1 = np.reshape(weights[0:W1_end], (self.D, 5))
+
+        W2_end = 5*self.C + W1_end
+        self.W2 = np.reshape(weights[W1_end:W2_end], (5, self.C))
+
+        b1_end = W2_end + 5
+        self.b1 = np.reshape(weights[W2_end:b1_end], (1, 5))
+
+        b2_end = b1_end + self.C
+        self.b2 = np.reshape(weights[b1_end:b2_end], (1, C))
 
 
 def train(model, params, lossClass, optimizationClass):
