@@ -1,5 +1,4 @@
 from animation import plot
-import sympy as sym
 import numpy as np
 
 
@@ -71,6 +70,7 @@ def sgdm(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
 
     return domain_point
 
+
 def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plotted, beta1, beta2, epsilon, precision):
     """
     :param function: function to be optimised
@@ -97,7 +97,8 @@ def adam(function, learning_rate, initial_point, num_of_iterations, is_to_be_plo
         second_moment_vector = beta2 * second_moment_vector + (1 - beta2) * np.power(gradient, 2)
         computational_first_moment_vector = first_moment_vector / (1 - np.power(beta1, iterations + 1))
         computational_second_moment_vector = second_moment_vector / (1 - np.power(beta2, iterations + 1))
-        domain_point = domain_point - learning_rate * computational_first_moment_vector / (np.sqrt(float(computational_second_moment_vector)) + epsilon)
+        domain_point = domain_point - learning_rate * computational_first_moment_vector \
+                       / (np.sqrt(float(computational_second_moment_vector)) + epsilon)
         domain_point_vector.append(domain_point)
         iterations += 1
 
