@@ -28,7 +28,7 @@ class Optimizator:
         w1 = np.transpose(self.model.W1) - self.params.learning_rate_sgd * grad_W1
         w2 = np.transpose(self.model.W2) - self.params.learning_rate_sgd * grad_W2
 
-        return w1, w2
+        return np.transpose(w1), np.transpose(w2)
 
     def __sgdm(self, grad_W1, grad_W2):
         self.domain_point_derivative_1 = \
@@ -39,7 +39,7 @@ class Optimizator:
         w1 = np.transpose(self.model.W1) + self.domain_point_derivative_1
         w2 = np.transpose(self.model.W2) + self.domain_point_derivative_2
 
-        return w1, w2
+        return np.transpose(w1), np.transpose(w2)
 
     def __adam(self, grad_W1, grad_W2):
         self.first_moment_vector_1 = \
@@ -64,4 +64,4 @@ class Optimizator:
         w2 = np.transpose(self.model.W2) - self.params.learning_rate * computational_first_moment_vector_2 / \
                        (np.sqrt(computational_second_moment_vector_2) + self.params.epsilon)
 
-        return w1, w2
+        return np.transpose(w1), np.transpose(w2)
