@@ -4,6 +4,7 @@ import data
 from importlib import import_module
 from grad_check import check_grad
 import optimizator
+import argparse
 
 
 class Model:
@@ -152,36 +153,22 @@ if __name__ == "__main__":
     np.random.seed(100)
     N = 100
     C = 2
-    parser = argparse.ArgumentParser(
-        description='Train a deep model.',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--params', default='parameters',
-                        help='Set the module with parameters')
-    parser.add_argument('--loss',
-                        default='CrossEntropyLoss',
-                        help='Set the module with the loss')
-    parser.add_argument('--optimizer',
-                        default='SGD',
-                        help='Set the optimizer')
-    parser.add_argument('--early-stopping',
-                        action='store_true', default=False,
-                        help='Use early stopping.')
+    parser = argparse.ArgumentParser(description='Train a deep model.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--params', default='parameters', help='Set the module with parameters')
+    parser.add_argument('--loss', default='CrossEntropyLoss', help='Set the module with the loss')
+    parser.add_argument('--optimizer', default='SGD', help='Set the optimizer')
+    parser.add_argument('--early_stopping', action='store_true', default=False, help='Use early stopping.')
     args = parser.parse_args()
     # print(args)
-    name = input("Unesite ime modula sa parametrima: ")
-    paramsModule = import_module(name if name else "paramaters")
-    name = input("Unesite ime modula sa funkcijom gubitka: ")
-    lossModule = import_module(name if name else "L1Loss")
-    # name = input("Unesite ime modula sa regularizacijom: ")
-    # regularizerModule = import_module(name if name else "L1Regularizer")
-    confirmation = input("Da li želite koristiti rano zaustavljanje: ")
-    earlyStopping = confirmation.lower() == "da"
     model = Model(N, 2, C)
     model.random_dataset(5, 2, int(N / 5))
+    paramsModule = import_module(args.params)
+    lossModule = import_module(args.loss)
+    # regularizerModule = import_module(args.regularizer)
+    earlyStopping = args.early_stopping
     # regularizerClass = regularizerModule.Regularizer
     lossClass = lossModule.Loss(model, paramsModule, None)
-    algorithm = input("Unesite željenu optimizaciju: ")
-    optimizationClass = optimizator.Optimizator(model, paramsModule, algorithm if algorithm else "SGD")
+    optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
     model.forward_pass()
 
     if earlyStopping:
