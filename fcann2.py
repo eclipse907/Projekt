@@ -81,13 +81,10 @@ def train(model, params, lossClass, optimizationClass):
             grad_W1 += reg_grads[0].T
             grad_W2 += reg_grads[1].T
 
-
-        grad_W1, grad_W2 = optimizationClass(grad_W1, grad_W2)
+        model.W1, model.W2 = optimizationClass(grad_W1, grad_W2)
         if i % 10 == 0:
             print("iteration {}: loss {}".format(i, loss))
-        model.W1 += np.transpose(grad_W1)
         model.b1 += -params.learning_rate_bias * grad_b1
-        model.W2 += np.transpose(grad_W2)
         model.b2 += -params.learning_rate_bias * grad_b2
 
 
