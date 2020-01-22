@@ -13,8 +13,6 @@ class Loss(LossFunction):
         loss_components = np.maximum(0, self.model.scores2 - self.true_class_scores + self.margin)
         loss_components[self.Y_oh == 1] = 0
 
-        #self.probs = self.stable_softmax(self.scores)
-        #self.probs = np.add(self.stable_softmax(self.scores), 1e-15)
         regularized_loss = np.sum(loss_components)
         if self.regularizers:
             for reg in self.regularizers:
