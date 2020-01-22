@@ -60,7 +60,7 @@ class Model:
         self.b1 = np.reshape(weights[W2_end:b1_end], (1, 5))
 
         b2_end = b1_end + self.C
-        self.b2 = np.reshape(weights[b1_end:b2_end], (1, C))
+        self.b2 = np.reshape(weights[b1_end:b2_end], (1, self.C))
 
 
 def train(model, params, lossClass, optimizationClass):
@@ -152,6 +152,22 @@ if __name__ == "__main__":
     np.random.seed(100)
     N = 100
     C = 2
+    parser = argparse.ArgumentParser(
+        description='Train a deep model.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--params', default='parameters',
+                        help='Set the module with parameters')
+    parser.add_argument('--loss',
+                        default='CrossEntropyLoss',
+                        help='Set the module with the loss')
+    parser.add_argument('--optimizer',
+                        default='SGD',
+                        help='Set the optimizer')
+    parser.add_argument('--early-stopping',
+                        action='store_true', default=False,
+                        help='Use early stopping.')
+    args = parser.parse_args()
+    # print(args)
     name = input("Unesite ime modula sa parametrima: ")
     paramsModule = import_module(name if name else "paramaters")
     name = input("Unesite ime modula sa funkcijom gubitka: ")
