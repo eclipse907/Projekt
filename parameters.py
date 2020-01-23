@@ -11,5 +11,6 @@ valid_set_factor = 0.3
 n_eval = 1
 patience = 10
 weight_decay = 1e-3
+hinge_margin = 1
 tolerance = 10e-7
 h = 10e-5

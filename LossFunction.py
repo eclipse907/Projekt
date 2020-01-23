@@ -11,6 +11,7 @@ class LossFunction(ABC):
                              ako je None nema regularizacije
         """
         self.model = model
+        self.params = paramsModule
         self.Y_ = model.Y_
         self.regularizers = [] if regularizer is None else\
             [regularizer(model.W1, paramsModule.weight_decay), regularizer(model.W2, paramsModule.weight_decay)]
