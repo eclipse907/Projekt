@@ -95,7 +95,6 @@ def prepareXYSubtrainAndValidSets(X_train, Y_train):
 
 # Algorithm 7.1
 def findOptimalParams(model0, inSet, outSet, n, p):
-    X_valid, X_subtrain = inSet[0], inSet[1]
     Y_valid, Y_subtrain = outSet[0], outSet[1]
 
     model = model0.copy()
@@ -111,8 +110,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
         i = i + n
 
-        dec_fun = fcann2_decfun(model)
-        probs = dec_fun(X_valid)
+        probs = lossClass.get_probs_from_scores(model.scores2)
         Y = np.argmax(probs, axis=0)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
         v_prime = 1 - accuracy
