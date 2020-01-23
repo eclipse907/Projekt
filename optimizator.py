@@ -59,9 +59,9 @@ class Optimizator:
         computational_second_moment_vector_2 = \
             self.second_moment_vector_2 / (1 - np.power(self.params.beta_2, self.iterations + 1))
 
-        w1 = np.transpose(self.model.W1) - self.params.learning_rate * computational_first_moment_vector_1 / \
+        w1 = np.transpose(self.model.W1) - self.params.learning_rate_adam * computational_first_moment_vector_1 / \
                        (np.sqrt(computational_second_moment_vector_1) + self.params.epsilon)
-        w2 = np.transpose(self.model.W2) - self.params.learning_rate * computational_first_moment_vector_2 / \
+        w2 = np.transpose(self.model.W2) - self.params.learning_rate_adam * computational_first_moment_vector_2 / \
                        (np.sqrt(computational_second_moment_vector_2) + self.params.epsilon)
 
         return np.transpose(w1), np.transpose(w2)
