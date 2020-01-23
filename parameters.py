@@ -1,4 +1,4 @@
-niter = 1000
+niter = 200
 learning_rate_bias = 0.15
 learning_rate_sgd = 0.1
 learning_rate_sgdm = 0.1
@@ -8,8 +8,8 @@ beta_1 = 0.9
 beta_2 = 0.999
 epsilon = 1e-8
 valid_set_factor = 0.3
-n_eval = 1
-patience = 10
+n_eval = 10
+patience = 5
 weight_decay = 1e-3
 hinge_margin = 1
 tolerance = 10e-7

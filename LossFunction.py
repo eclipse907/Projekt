@@ -4,7 +4,7 @@ import numpy as np
 
 class LossFunction(ABC):
 
-    def __init__(self, model, paramsModule, regularizer, Y_):
+    def __init__(self, model, paramsModule, regularizerModule, Y_):
         """
         :param Y_: array tocnih klasa, N x 1
         :param regularizers: klasa regularizatora
@@ -13,8 +13,8 @@ class LossFunction(ABC):
         self.model = model
         self.params = paramsModule
         self.Y_ = Y_
-        self.regularizers = [] if regularizer is None else\
-            [regularizer(model.W1, paramsModule.weight_decay), regularizer(model.W2, paramsModule.weight_decay)]
+        self.regularizers = [] if regularizerModule is None else\
+            [regularizerModule.Regularizer(model.W1, paramsModule.weight_decay), regularizerModule.Regularizer(model.W2, paramsModule.weight_decay)]
 
     @abstractmethod
     def forward(self):
