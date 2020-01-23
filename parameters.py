@@ -1,3 +1,4 @@
+hidden_layer_neurons = 10
 niter = 200
 learning_rate_bias = 0.15
 learning_rate_sgd = 0.1

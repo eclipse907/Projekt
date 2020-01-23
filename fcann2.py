@@ -9,13 +9,14 @@ import tensorflow as tf
 
 class Model:
 
-    def __init__(self, N, D, C):
+    def __init__(self, N, D, C, H):
         self.N = N
         self.D = D
         self.C = C
-        self.W1 = np.random.randn(D, 10)
-        self.b1 = np.random.randn(1, 10)
-        self.W2 = np.random.randn(10, C)
+        self.H = H # Number of neurons in hidden layers
+        self.W1 = np.random.randn(D, H)
+        self.b1 = np.random.randn(1, H)
+        self.W2 = np.random.randn(H, C)
         self.b2 = np.random.randn(1, C)
 
     def forward_pass(self, X):
@@ -43,14 +44,14 @@ class Model:
         return np.concatenate((self.W1.ravel(), self.W2.ravel(), self.b1.ravel(), self.b2.ravel()))
 
     def set_params(self, weights):
-        W1_end = self.D*5
-        self.W1 = np.reshape(weights[0:W1_end], (self.D, 5))
+        W1_end = self.D*self.H
+        self.W1 = np.reshape(weights[0:W1_end], (self.D, self.H))
 
-        W2_end = 5*self.C + W1_end
-        self.W2 = np.reshape(weights[W1_end:W2_end], (5, self.C))
+        W2_end = self.H*self.C + W1_end
+        self.W2 = np.reshape(weights[W1_end:W2_end], (self.H, self.C))
 
-        b1_end = W2_end + 5
-        self.b1 = np.reshape(weights[W2_end:b1_end], (1, 5))
+        b1_end = W2_end + self.H
+        self.b1 = np.reshape(weights[W2_end:b1_end], (1, self.H))
 
         b2_end = b1_end + self.C
         self.b2 = np.reshape(weights[b1_end:b2_end], (1, self.C))
@@ -161,12 +162,12 @@ if __name__ == "__main__":
     parser.add_argument('--optimizer', default='SGD', help='Set the optimizer')
     parser.add_argument('--early_stopping', action='store_true', default=False, help='Use early stopping.')
     args = parser.parse_args()
-    model = Model(N, D, C)
     paramsModule = import_module(args.params)
     lossModule = import_module(args.loss)
     regularizerModule = import_module(args.regularizer)
     earlyStopping = args.early_stopping
 
+    model = Model(N, D, C, paramsModule.hidden_layer_neurons)
     lossClass = lossModule.Loss(model, paramsModule, regularizerModule, y_train)
     optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
     model.forward_pass(x_train)
