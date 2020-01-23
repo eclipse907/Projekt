@@ -162,17 +162,17 @@ if __name__ == "__main__":
     optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
 
     if earlyStopping:
-        subtrain, valid = prepareXYSubtrainAndValidSets(model.X, model.Y_)
+        subtrain, valid = prepareXYSubtrainAndValidSets(x_train, y_train)
         # find optimal params by early stopping
         opt_model, opt_niter, opt_error = findOptimalParams(model, subtrain, valid, paramsModule.n_eval,
                                                             paramsModule.patience)
         model_new = model.copy()
         lossClass = lossModule.Loss(model_new, paramsModule, None)
         optimizationClass = optimizator.Optimizator(model_new, paramsModule, args.optimizer)
-        train(model_new, paramsModule, lossClass, optimizationClass)
+        train(model_new, paramsModule, lossClass, optimizationClass, x_train)
         model = model_new
     else:
-        train(model, paramsModule, lossClass, optimizationClass)
+        train(model, paramsModule, lossClass, optimizationClass, x_train)
 
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
