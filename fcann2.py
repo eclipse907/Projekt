@@ -174,6 +174,7 @@ if __name__ == "__main__":
     D_test = x_test.shape[1] * x_test.shape[2]
     C_test = np.max(y_test) + 1
     x_test = np.reshape(x_test, (N_test, D_test))
+    lossClass.Y_ = y_test
     model.forward_pass(x_test)
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
