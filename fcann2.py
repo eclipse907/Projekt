@@ -117,7 +117,7 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
     while j < p:
         paramsModule.niter = n
-        train(model, paramsModule, lossClass, optimizationClass)
+        train(model, paramsModule, lossClass, optimizationClass, X_subtrain)
 
         i = i + n
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument('--params', default='parameters', help='Set the module with parameters')
     parser.add_argument('--loss', default='CrossEntropyLoss', help='Set the module with the loss')
     parser.add_argument('--optimizer', default='SGD', help='Set the optimizer')
-    parser.add_argument('--early_stopping', action='store_true', default=False, help='Use early stopping.')
+    parser.add_argument('--early_stopping', action='store_true', default=True, help='Use early stopping.')
     args = parser.parse_args()
     model = Model(N, D, C)
     paramsModule = import_module(args.params)
@@ -160,6 +160,7 @@ if __name__ == "__main__":
     # regularizerClass = regularizerModule.Regularizer
     lossClass = lossModule.Loss(model, paramsModule, None, y_train)
     optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
+    model.forward_pass(x_train)
 
     if earlyStopping:
         subtrain, valid = prepareXYSubtrainAndValidSets(x_train, y_train)
@@ -169,6 +170,7 @@ if __name__ == "__main__":
         model_new = model.copy()
         lossClass = lossModule.Loss(model_new, paramsModule, None)
         optimizationClass = optimizator.Optimizator(model_new, paramsModule, args.optimizer)
+        print("-------------------*********", opt_niter, "-------------------*********")
         train(model_new, paramsModule, lossClass, optimizationClass, x_train)
         model = model_new
     else:
