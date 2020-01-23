@@ -178,3 +178,6 @@ if __name__ == "__main__":
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
     accuracy, recall, precision = data.eval_perf_multi(Y, y_test)
+    print(accuracy)
+    print(precision)
+    print(recall)
