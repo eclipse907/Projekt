@@ -1,10 +1,12 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import data
-from importlib import import_module
-from grad_check import check_grad
-import optimizator
 import argparse
+from importlib import import_module
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+import data
+import optimizator
+from grad_check import check_grad
 
 
 class Model:
@@ -44,7 +46,7 @@ class Model:
         newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
         newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
         newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
-        newModel.scores2 = self.scores2.copy()
+        # newModel.scores2 = self.scores2.copy()
         return newModel
 
     def get_params(self):
@@ -99,7 +101,8 @@ def fcann2_decfun(model):
         expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
         sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
         probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
-        return probs[:, 0]
+        Y = np.argmax(probs, axis=1)
+        return Y
     return classify
 
 def prepareXYSubtrainAndValidSets(X_train, Y_train):
@@ -112,31 +115,35 @@ def prepareXYSubtrainAndValidSets(X_train, Y_train):
     X_valid, Y_valid = X_train[mask, :], Y_train[mask]
     X_subtrain, Y_subtrain = X_train[np.logical_not(mask), :], Y_train[np.logical_not(mask)]
 
-    return (X_valid, X_subtrain), (Y_valid, Y_subtrain)
+    return (X_subtrain, Y_subtrain), (X_valid, Y_valid)
 
 # Algorithm 7.1
-def findOptimalParams(model0, inSet, outSet, n, p):
-    X_valid, X_subtrain = inSet[0], inSet[1]
-    Y_valid, Y_subtrain = outSet[0], outSet[1]
+def findOptimalParams(model0, subtrain, valid, n, p):
+    X_subtrain, Y_subtrain = subtrain[0], subtrain[1]
+    X_valid, Y_valid = valid[0], valid[1]
 
     model = model0.copy()
+    model.X, model.Y_ = X_subtrain, Y_subtrain
+    model.N = X_subtrain.shape[0]
     i = 0
     j = 0
     v = np.inf
-    model_star = model.copy()
+    model_star = model0.copy()
     i_star = i
+    paramsModule.niter = n
+
+    lossClass = lossModule.Loss(model, paramsModule, None)
+    optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
 
     while j < p:
-        paramsModule.niter = n
         train(model, paramsModule, lossClass, optimizationClass)
 
         i = i + n
 
-        dec_fun = fcann2_decfun(model)
-        probs = dec_fun(X_valid)
-        Y = np.argmax(probs, axis=0)
+        classify = fcann2_decfun(model)
+        Y = classify(X_valid)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
-        v_prime = 1 - accuracy
+        v_prime = 1. - accuracy
 
         if v_prime < v:
             j = 0
@@ -169,16 +176,18 @@ if __name__ == "__main__":
     # regularizerClass = regularizerModule.Regularizer
     lossClass = lossModule.Loss(model, paramsModule, None)
     optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
-    model.forward_pass()
+    # model.forward_pass()
 
     if earlyStopping:
-        inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)
-        inSet = inOutSets[0]
-        outSet = inOutSets[1]
+        subtrain, valid = prepareXYSubtrainAndValidSets(model.X, model.Y_)
         # find optimal params by early stopping
-        opt_model, opt_niter, opt_error = findOptimalParams(model.copy(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
+        opt_model, opt_niter, opt_error = findOptimalParams(model, subtrain, valid, paramsModule.n_eval,
+                                                            paramsModule.patience)
         model_new = model.copy()
+        lossClass = lossModule.Loss(model_new, paramsModule, None)
+        optimizationClass = optimizator.Optimizator(model_new, paramsModule, args.optimizer)
         train(model_new, paramsModule, lossClass, optimizationClass)
+        model = model_new
     else:
         train(model, paramsModule, lossClass, optimizationClass)
 
