@@ -1,21 +1,9 @@
-<<<<<<< HEAD
 import numpy as np
-=======
-import argparse
-from importlib import import_module
-
-import matplotlib.pyplot as plt
-import numpy as np
-
->>>>>>> 455992eb446d0243f44d1db743e0dd07509e04e9
 import data
+from importlib import import_module
 import optimizator
-<<<<<<< HEAD
 import argparse
 import tensorflow as tf
-=======
-from grad_check import check_grad
->>>>>>> 455992eb446d0243f44d1db743e0dd07509e04e9
 
 
 class Model:
@@ -47,12 +35,7 @@ class Model:
         newModel = Model(self.N, self.D, self.C)
         newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
         newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
-<<<<<<< HEAD
         newModel.scores2 = self.scores2.copy()
-=======
-        newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
-        # newModel.scores2 = self.scores2.copy()
->>>>>>> 455992eb446d0243f44d1db743e0dd07509e04e9
         return newModel
 
     def get_params(self):
@@ -96,7 +79,17 @@ def train(model, params, lossClass, optimizationClass, X):
         model.b1 += -params.learning_rate_bias * grad_b1
         model.b2 += -params.learning_rate_bias * grad_b2
 
-
+def classify(X, model):
+    N = X.shape[0]
+    scores1 = np.dot(X, model.W1) + model.b1  # N x 5
+    hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
+    scores2 = np.dot(hiddenLayer1, model.W2) + model.b2  # N x C
+    maxScores2 = np.amax(scores2, axis=1)  # 1 x N
+    expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
+    sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
+    probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
+    Y = np.argmax(probs, axis=1)
+    return Y
 
 def prepareXYSubtrainAndValidSets(X_train, Y_train):
     n_samples = X_train.shape[0]
@@ -111,33 +104,27 @@ def prepareXYSubtrainAndValidSets(X_train, Y_train):
     return (X_subtrain, Y_subtrain), (X_valid, Y_valid)
 
 # Algorithm 7.1
-<<<<<<< HEAD
 def findOptimalParams(model0, inSet, outSet, n, p):
+    X_valid, X_subtrain = inSet[0], inSet[1]
     Y_valid, Y_subtrain = outSet[0], outSet[1]
 
     model = model0.copy()
-    model.X, model.Y_ = X_subtrain, Y_subtrain
-    model.N = X_subtrain.shape[0]
     i = 0
     j = 0
     v = np.inf
-    model_star = model0.copy()
+    model_star = model.copy()
     i_star = i
-    paramsModule.niter = n
-
-    lossClass = lossModule.Loss(model, paramsModule, None)
-    optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
 
     while j < p:
+        paramsModule.niter = n
         train(model, paramsModule, lossClass, optimizationClass)
 
         i = i + n
 
-        probs = lossClass.get_probs_from_scores(model.scores2)
+        probs = classify(X_valid, model)
         Y = np.argmax(probs, axis=0)
-
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
-        v_prime = 1. - accuracy
+        v_prime = 1 - accuracy
 
         if v_prime < v:
             j = 0
