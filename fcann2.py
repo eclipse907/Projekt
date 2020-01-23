@@ -104,27 +104,31 @@ def prepareXYSubtrainAndValidSets(X_train, Y_train):
     return (X_subtrain, Y_subtrain), (X_valid, Y_valid)
 
 # Algorithm 7.1
-def findOptimalParams(model0, inSet, outSet, n, p):
-    X_valid, X_subtrain = inSet[0], inSet[1]
-    Y_valid, Y_subtrain = outSet[0], outSet[1]
+def findOptimalParams(model0, subtrain, valid, n, p):
+    X_subtrain, Y_subtrain = subtrain[0], subtrain[1]
+    X_valid, Y_valid = valid[0], valid[1]
 
     model = model0.copy()
+    model.X, model.Y_ = X_subtrain, Y_subtrain
+    model.N = X_subtrain.shape[0]
     i = 0
     j = 0
     v = np.inf
-    model_star = model.copy()
+    model_star = model0.copy()
     i_star = i
+    paramsModule.niter = n
+
+    lossClass = lossModule.Loss(model, paramsModule, None, Y_subtrain)
+    optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
 
     while j < p:
-        paramsModule.niter = n
         train(model, paramsModule, lossClass, optimizationClass, X_subtrain)
 
         i = i + n
 
-        probs = classify(X_valid, model)
-        Y = np.argmax(probs, axis=0)
+        Y = classify(X_valid, model)
         accuracy, pr, M = data.eval_perf_multi(Y, Y_valid)
-        v_prime = 1 - accuracy
+        v_prime = 1. - accuracy
 
         if v_prime < v:
             j = 0
@@ -168,7 +172,6 @@ if __name__ == "__main__":
         opt_model, opt_niter, opt_error = findOptimalParams(model, subtrain, valid, paramsModule.n_eval,
                                                             paramsModule.patience)
         model_new = model.copy()
-        lossClass = lossModule.Loss(model_new, paramsModule, None)
         optimizationClass = optimizator.Optimizator(model_new, paramsModule, args.optimizer)
         print("-------------------*********", opt_niter, "-------------------*********")
         train(model_new, paramsModule, lossClass, optimizationClass, x_train)
