@@ -1,10 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import data
 from importlib import import_module
 from grad_check import check_grad
 import optimizator
 import argparse
+import tensorflow as tf
 
 
 class Model:
@@ -13,29 +13,22 @@ class Model:
         self.N = N
         self.D = D
         self.C = C
-        self.W1 = np.random.randn(D, 5)
-        self.b1 = np.random.randn(1, 5)
-        self.W2 = np.random.randn(5, C)
+        self.W1 = np.random.randn(D, 10)
+        self.b1 = np.random.randn(1, 10)
+        self.W2 = np.random.randn(10, C)
         self.b2 = np.random.randn(1, C)
 
-    def random_dataset(self, ncomponents, nclasses, nsamples):
-        self.X, self.Y_ = data.sample_gmm_2d(ncomponents, nclasses, nsamples)
-
-    def init_dataset(self, X, Y_):
-        self.X = X
-        self.Y_ = Y_
-
-    def forward_pass(self):
-        self.scores1 = np.dot(self.X, self.W1) + self.b1  # N x 5
+    def forward_pass(self, X):
+        self.scores1 = np.dot(X, self.W1) + self.b1  # N x 5
         self.hiddenLayer1 = np.where(self.scores1 < 0, 0, self.scores1)  # N x 5
         self.scores2 = np.dot(self.hiddenLayer1, self.W2) + self.b2  # N x C
 
-    def backward_pass(self, Gs2):
+    def backward_pass(self, Gs2, X):
         grad_W2 = np.dot(np.transpose(Gs2), self.hiddenLayer1) / self.N  # C x 5
         grad_b2 = np.sum(np.transpose(Gs2), axis=1) / self.N  # C x 1
         Gh1 = np.transpose(np.dot(self.W2, np.transpose(Gs2)))  # N x 5
         Gs1 = np.where(self.scores1 < 0, 0, Gh1)  # N x 5
-        grad_W1 = np.dot(np.transpose(Gs1), self.X) / self.N  # 5 x D
+        grad_W1 = np.dot(np.transpose(Gs1), X) / self.N  # 5 x D
         grad_b1 = np.sum(np.transpose(Gs1), axis=1) / self.N  # 5 x 1
         return grad_W1, grad_b1, grad_W2, grad_b2
 
@@ -43,7 +36,6 @@ class Model:
         newModel = Model(self.N, self.D, self.C)
         newModel.W1, newModel.b1 = self.W1.copy(), self.b1.copy()
         newModel.W2, newModel.b2 = self.W2.copy(), self.b2.copy()
-        newModel.X, newModel.Y_ = self.X.copy(), self.Y_.copy()
         newModel.scores2 = self.scores2.copy()
         return newModel
 
@@ -64,17 +56,17 @@ class Model:
         self.b2 = np.reshape(weights[b1_end:b2_end], (1, self.C))
 
 
-def train(model, params, lossClass, optimizationClass):
+def train(model, params, lossClass, optimizationClass, X):
     for i in range(params.niter):
-        model.forward_pass()
+        model.forward_pass(X)
         loss = lossClass.forward()
         Gs2 = lossClass.backward_inputs()
-        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2)
+        grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2, X)
 
-        if i % 100 == 0:
-            grad = np.concatenate((grad_W1.ravel(), grad_W2.ravel(), grad_b1.ravel(), grad_b2.ravel()))
-            message = check_grad(grad, model, params, lossClass)
-            print(message)
+        # if i % 100 == 0:
+        #     grad = np.concatenate((grad_W1.ravel(), grad_W2.ravel(), grad_b1.ravel(), grad_b2.ravel()))
+        #     message = check_grad(grad, model, params, lossClass, X)
+        #     print(message)
 
         if lossClass.regularizers:
             reg_grads = lossClass.backward_params()
@@ -88,19 +80,6 @@ def train(model, params, lossClass, optimizationClass):
         model.b1 += -params.learning_rate_bias * grad_b1
         model.b2 += -params.learning_rate_bias * grad_b2
 
-
-def fcann2_decfun(model):
-    def classify(X):
-        N = X.shape[0]
-        scores1 = np.dot(X, model.W1) + model.b1  # N x 5
-        hiddenLayer1 = np.where(scores1 < 0, 0, scores1)  # N x 5
-        scores2 = np.dot(hiddenLayer1, model.W2) + model.b2  # N x C
-        maxScores2 = np.amax(scores2, axis=1)  # 1 x N
-        expscores2 = np.exp(scores2 - maxScores2.reshape((N, 1)))  # N x C
-        sumexp2 = np.sum(expscores2, axis=1)  # 1 x N
-        probs = expscores2 / sumexp2.reshape((N, 1))  # N x C
-        return probs[:, 0]
-    return classify
 
 def prepareXYSubtrainAndValidSets(X_train, Y_train):
     n_samples = X_train.shape[0]
@@ -150,45 +129,42 @@ def findOptimalParams(model0, inSet, outSet, n, p):
 
 
 if __name__ == "__main__":
-    np.random.seed(100)
-    N = 100
-    C = 2
+    # np.random.seed(100)
+    mnist = tf.keras.datasets.mnist
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    x_train, x_test = x_train / 255.0, x_test / 255.0
+    N = x_train.shape[0]
+    D = x_train.shape[1] * x_train.shape[2]
+    C = np.max(y_train) + 1
+    x_train = np.reshape(x_train, (N, D))
     parser = argparse.ArgumentParser(description='Train a deep model.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--params', default='parameters', help='Set the module with parameters')
     parser.add_argument('--loss', default='CrossEntropyLoss', help='Set the module with the loss')
     parser.add_argument('--optimizer', default='SGD', help='Set the optimizer')
     parser.add_argument('--early_stopping', action='store_true', default=False, help='Use early stopping.')
     args = parser.parse_args()
-    # print(args)
-    model = Model(N, 2, C)
-    model.random_dataset(5, 2, int(N / 5))
+    model = Model(N, D, C)
     paramsModule = import_module(args.params)
     lossModule = import_module(args.loss)
     # regularizerModule = import_module(args.regularizer)
     earlyStopping = args.early_stopping
     # regularizerClass = regularizerModule.Regularizer
-    lossClass = lossModule.Loss(model, paramsModule, None)
+    lossClass = lossModule.Loss(model, paramsModule, None, y_train)
     optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
-    model.forward_pass()
+    model.forward_pass(x_train)
 
     if earlyStopping:
-        inOutSets = prepareXYSubtrainAndValidSets(model.X, model.Y_)
+        inOutSets = prepareXYSubtrainAndValidSets(x_train, y_train)
         inSet = inOutSets[0]
         outSet = inOutSets[1]
         # find optimal params by early stopping
         opt_model, opt_niter, opt_error = findOptimalParams(model.copy(), inSet, outSet, paramsModule.n_eval, paramsModule.patience)
         model_new = model.copy()
-        train(model_new, paramsModule, lossClass, optimizationClass)
+        train(model_new, paramsModule, lossClass, optimizationClass, x_train)
     else:
-        train(model, paramsModule, lossClass, optimizationClass)
+        train(model, paramsModule, lossClass, optimizationClass, x_train)
 
     probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
-    decfun = fcann2_decfun(model)
-    rect = (np.min(model.X, axis=0), np.max(model.X, axis=0))
-    data.graph_surface(decfun, rect, offset=0)
-
-    # graph the data points
-    data.graph_data(model.X, model.Y_, Y, special=[])
-
-    plt.show()
+    accuracy, recall, precision = data.eval_perf_multi(Y, y_train)
+    print(accuracy, recall, precision)

@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def check_grad(grad, model, params, loss_class):
+def check_grad(grad, model, params, loss_class, X):
     # Numerički izačunati gradijent
-    numGrad = compute_numerical_gradient(model, params, loss_class)
+    numGrad = compute_numerical_gradient(model, params, loss_class, X)
 
     # Usporedi
     brojnik = np.linalg.norm(grad - numGrad)
@@ -16,7 +16,7 @@ def check_grad(grad, model, params, loss_class):
     return '{0} gradijent. Razlika = {1}'.format(str, diff)
 
 
-def compute_numerical_gradient(model, params, loss_class):
+def compute_numerical_gradient(model, params, loss_class, X):
     # Get the parameters (weights & biases)
     weights = model.get_params()
     h_vector = np.zeros(weights.shape)
@@ -26,11 +26,11 @@ def compute_numerical_gradient(model, params, loss_class):
         h_vector[i] = params.h
 
         model.set_params(weights + h_vector)
-        model.forward_pass()
+        model.forward_pass(X)
         f_plus = loss_class.forward()
 
         model.set_params(weights - h_vector)
-        model.forward_pass()
+        model.forward_pass(X)
         f_minus = loss_class.forward()
 
         # Izračunaj numerički gradijent
