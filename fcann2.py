@@ -155,7 +155,7 @@ if __name__ == "__main__":
     parser.add_argument('--loss', default='CrossEntropyLoss', help='Set the module with the loss')
     parser.add_argument('--optimizer', default='SGD', help='Set the optimizer')
     parser.add_argument('--early_stopping', action='store_true', default=False, help='Use early stopping.')
-    parser.add_argument('--regularizer', default='L1Regularizer', help='Set the regularizer')
+    parser.add_argument('--regularizer', default='L2Regularizer', help='Set the regularizer')
     args = parser.parse_args()
     model = Model(N, D, C)
     paramsModule = import_module(args.params)
