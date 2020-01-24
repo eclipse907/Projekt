@@ -193,10 +193,12 @@ if __name__ == "__main__":
 
     print("W1 = ", model.W1)
     print("W2 = ", model.W2)
-    probs = lossClass.get_probs_from_scores(model.scores2, y_train)
+    probs = lossClass.get_probs_from_scores(model.scores2)
     Y = np.argmax(probs, axis=1)
     accuracy, recall, precision = data.eval_perf_multi(Y, y_train)
-    print(accuracy, recall, precision)
+    print(accuracy)
+    print(precision)
+    print(recall)
 
     N_test = x_test.shape[0]
     D_test = x_test.shape[1] * x_test.shape[2]
@@ -207,4 +209,6 @@ if __name__ == "__main__":
     probs = lossClass.get_probs_from_scores(model.scores2, y_test)
     Y = np.argmax(probs, axis=1)
     accuracy, recall, precision = data.eval_perf_multi(Y, y_test)
-    print(accuracy, recall, precision)
+    print(accuracy)
+    print(precision)
+    print(recall)
