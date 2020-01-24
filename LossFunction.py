@@ -38,9 +38,9 @@ class LossFunction(ABC):
         probs = expscores / sumexp.reshape((N, 1))  # N x C
         return probs
 
-    def get_probs_from_scores(self, scores, y_):
+    def get_probs_from_scores(self, scores, Y_):
         Y_oh = np.zeros(scores.shape)
-        Y_oh[range(scores.shape[0]), y_] = 1
+        Y_oh[range(scores.shape[0]), Y_] = 1
         probs = self.stable_softmax(scores)
 
         return probs
