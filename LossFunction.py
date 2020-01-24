@@ -4,7 +4,7 @@ import numpy as np
 
 class LossFunction(ABC):
 
-    def __init__(self, model, paramsModule, regularizerModule, Y_):
+    def __init__(self, model, paramsModule, regularizerModule):
         """
         :param Y_: array tocnih klasa, N x 1
         :param regularizers: klasa regularizatora
@@ -12,12 +12,11 @@ class LossFunction(ABC):
         """
         self.model = model
         self.params = paramsModule
-        self.Y_ = Y_
         self.regularizers = [] if regularizerModule is None else\
             [regularizerModule.Regularizer(model.W1, paramsModule.weight_decay), regularizerModule.Regularizer(model.W2, paramsModule.weight_decay)]
 
     @abstractmethod
-    def forward(self):
+    def forward(self, y_):
         pass
 
     @abstractmethod
@@ -39,9 +38,9 @@ class LossFunction(ABC):
         probs = expscores / sumexp.reshape((N, 1))  # N x C
         return probs
 
-    def get_probs_from_scores(self, scores):
+    def get_probs_from_scores(self, scores, y_):
         Y_oh = np.zeros(scores.shape)
-        Y_oh[range(scores.shape[0]), self.Y_] = 1
+        Y_oh[range(scores.shape[0]), y_] = 1
         probs = self.stable_softmax(scores)
 
         return probs

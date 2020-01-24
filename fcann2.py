@@ -57,17 +57,23 @@ class Model:
         self.b2 = np.reshape(weights[b1_end:b2_end], (1, self.C))
 
 
-def train(model, params, lossClass, optimizationClass, X):
+def train(model, params, lossClass, optimizationClass, X, Y_):
     for i in range(params.niter):
+        if i % 100 == 0:
+            x_subset = X[:100,:] # mini batch just for grad check not to go through whole dataset
+            y_subset = Y_[:100]
+            model.forward_pass(x_subset)
+            loss = lossClass.forward(y_subset)
+            Gs2 = lossClass.backward_inputs()
+            grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2, x_subset)
+            grad = np.concatenate((grad_W1.ravel(), grad_W2.ravel(), grad_b1.ravel(), grad_b2.ravel()))
+            message = check_grad(grad, model, params, lossClass, x_subset, y_subset)
+            print(message)
+
         model.forward_pass(X)
-        loss = lossClass.forward()
+        loss = lossClass.forward(Y_)
         Gs2 = lossClass.backward_inputs()
         grad_W1, grad_b1, grad_W2, grad_b2 = model.backward_pass(Gs2, X)
-
-        # if i % 100 == 0:
-        #     grad = np.concatenate((grad_W1.ravel(), grad_W2.ravel(), grad_b1.ravel(), grad_b2.ravel()))
-        #     message = check_grad(grad, model, params, lossClass, X)
-        #     print(message)
 
         if lossClass.regularizers:
             reg_grads = lossClass.backward_params()
@@ -168,7 +174,7 @@ if __name__ == "__main__":
     earlyStopping = args.early_stopping
 
     model = Model(N, D, C, paramsModule.hidden_layer_neurons)
-    lossClass = lossModule.Loss(model, paramsModule, regularizerModule, y_train)
+    lossClass = lossModule.Loss(model, paramsModule, regularizerModule)
     optimizationClass = optimizator.Optimizator(model, paramsModule, args.optimizer)
     model.forward_pass(x_train)
 
@@ -180,14 +186,14 @@ if __name__ == "__main__":
         model_new = model.copy()
         optimizationClass = optimizator.Optimizator(model_new, paramsModule, args.optimizer)
         print("-------------------*********", opt_niter, "-------------------*********")
-        train(model_new, paramsModule, lossClass, optimizationClass, x_train)
+        train(model_new, paramsModule, lossClass, optimizationClass, x_train, y_train)
         model = model_new
     else:
-        train(model, paramsModule, lossClass, optimizationClass, x_train)
+        train(model, paramsModule, lossClass, optimizationClass, x_train, y_train)
 
     print("W1 = ", model.W1)
     print("W2 = ", model.W2)
-    probs = lossClass.get_probs_from_scores(model.scores2)
+    probs = lossClass.get_probs_from_scores(model.scores2, y_train)
     Y = np.argmax(probs, axis=1)
     accuracy, recall, precision = data.eval_perf_multi(Y, y_train)
     print(accuracy, recall, precision)
@@ -198,7 +204,7 @@ if __name__ == "__main__":
     x_test = np.reshape(x_test, (N_test, D_test))
     lossClass.Y_ = y_test
     model.forward_pass(x_test)
-    probs = lossClass.get_probs_from_scores(model.scores2)
+    probs = lossClass.get_probs_from_scores(model.scores2, y_test)
     Y = np.argmax(probs, axis=1)
     accuracy, recall, precision = data.eval_perf_multi(Y, y_test)
     print(accuracy, recall, precision)

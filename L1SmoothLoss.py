@@ -4,14 +4,15 @@ from LossFunction import LossFunction
 
 class Loss(LossFunction):
 
-    def forward(self):
+    def forward(self, y_):
         """
          Returns:
           Scalar, smooth l1 loss.
         """
+        n = y_.shape[0]
         self.scores = self.model.scores2
         self.Y_oh = np.zeros(self.scores.shape)
-        self.Y_oh[range(self.scores.shape[0]), self.Y_] = 1
+        self.Y_oh[range(self.scores.shape[0]), y_] = 1
         self.probs = self.stable_softmax(self.scores)
         # print(lossAllWeights)
         regularized_loss = np.sum(np.where(np.abs(self.probs - self.Y_oh) < 1,
